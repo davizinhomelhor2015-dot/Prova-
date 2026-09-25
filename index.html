@@ -628,14 +628,7 @@ body.exam-lock { -webkit-user-select: none; user-select: none; }
         </button>
       </form>
       <div id="login-msg"></div>
-      <p class="muted small" id="fb-status" style="text-align:center;margin-top:18px;font-size:0.75rem">
-        <i class="fas fa-circle" style="color:var(--text-faint);font-size:0.55rem"></i> Conectando ao Firebase...
-      </p>
-      <p style="text-align:center;margin-top:8px;font-size:0.72rem">
-        <a href="#" onclick="runDiagnostics(true);return false" style="color:var(--text-faint);text-decoration:none">
-          <i class="fas fa-stethoscope" style="margin-right:4px"></i>Diagnosticar conexão
-        </a>
-      </p>
+      <span id="fb-status" style="display:none"></span>
     </div>
   </div>
 </div>
@@ -808,12 +801,6 @@ const db = fbApp.database();
 let FIREBASE_CONNECTED = false;
 db.ref(".info/connected").on("value", (snap) => {
   FIREBASE_CONNECTED = snap.val() === true;
-  const el = document.getElementById("fb-status");
-  if (el) {
-    el.innerHTML = FIREBASE_CONNECTED
-      ? '<i class="fas fa-circle" style="color:var(--good);font-size:0.55rem"></i> Firebase online'
-      : '<i class="fas fa-circle" style="color:var(--bad);font-size:0.55rem"></i> Firebase offline';
-  }
 });
 
 function usernameToEmail(username) {
@@ -2656,14 +2643,11 @@ function cpRegras() {
 }
 
 function showHelpFab() {
-  const f = document.getElementById("help-fab");
-  if (f) f.style.display = "block";
+  /* botão de ajuda desativado */
 }
 
 function alertHelpFab() {
-  showHelpFab();
-  const b = document.getElementById("help-fab-badge");
-  if (b) b.classList.remove("hidden");
+  /* alerta visual desativado */
 }
 
 // Setup guide link removed
@@ -2745,33 +2729,10 @@ function copyHost() {
   });
 }
 
-/* Detecta ambiente e exibe no rodapé do login */
-(function showEnvInfo() {
-  window.addEventListener("load", () => {
-    const el = document.getElementById("fb-status");
-    if (!el) return;
-    if (location.protocol === "file:") {
-      el.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--warn);font-size:.7rem"></i> ' +
-        '<a href="#" onclick="showDomainFix();return false" style="color:var(--warn)">Arquivo local — clique para ver como resolver</a>';
-    }
-  });
-})();
+/* showEnvInfo desativado */
 
 
-/* Banner de aviso se estiver no GitHub Pages sem autorização */
-(function githubPagesCheck() {
-  window.addEventListener("load", () => {
-    if (!location.hostname.includes("github.io")) return;
-    // Testa a conexão com Firebase Auth após 2s
-    setTimeout(() => {
-      const st = document.getElementById("fb-status");
-      if (st && !FIREBASE_CONNECTED) {
-        st.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--warn);font-size:.7rem"></i> ' +
-          '<a href="#" onclick="showDomainFix();return false" style="color:var(--warn)">Domínio precisa ser autorizado — clique aqui</a>';
-      }
-    }, 2500);
-  });
-})();
+/* githubPagesCheck desativado */
 
 
 /* ============================================================
@@ -2780,9 +2741,10 @@ function copyHost() {
 const DIAG = { sdk:null, app:null, dbConn:null, dbRead:null, authReady:null, domain:null, errors:[] };
 
 function diagBadge(state) {
-  if (state === true)  return '<span style="color:var(--good)">✓ OK</span>';
-  if (state === false) return '<span style="color:var(--bad)">✗ FALHOU</span>';
-  if (state === "wait")return '<span style="color:var(--warn)">⏳ testando…</span>';
+  if (state === true)   return '<span style="color:var(--good)">✓ OK</span>';
+  if (state === false)  return '<span style="color:var(--bad)">✗ FALHOU</span>';
+  if (state === "auth") return '<span style="color:var(--accent-2)">🔒 requer login</span>';
+  if (state === "wait") return '<span style="color:var(--warn)">⏳ testando…</span>';
   return '<span style="color:var(--text-faint)">— não testado</span>';
 }
 
@@ -2810,6 +2772,7 @@ function renderDiag() {
             <span style="font-size:.8rem;font-weight:700;white-space:nowrap">${diagBadge(state)}</span>
           </div>
           ${state===false ? `<div class="small muted" style="margin-top:5px;line-height:1.5">${hint}</div>` : ''}
+          ${state==="auth" ? `<div class="small" style="margin-top:5px;line-height:1.5;color:var(--accent-2)">Normal — as regras exigem login. Clique em Entrar para verificar de verdade.</div>` : ''}
         </div>`).join("")}
     </div>
 
@@ -2879,12 +2842,19 @@ async function runDiagnostics(showResult) {
   });
 
   // 4. Leitura do banco (testa regras)
+  const loggedIn = !!auth.currentUser;
   try {
     await db.ref("questions").limitToFirst(1).once("value");
     DIAG.dbRead = true;
   } catch(e) {
-    DIAG.dbRead = false;
-    DIAG.errors.push("Leitura: " + (e.code || e.message || "PERMISSION_DENIED"));
+    const msg = (e.code || e.message || "").toString();
+    if (!loggedIn && msg.includes("PERMISSION_DENIED")) {
+      // Esperado: regras exigem autenticação e ainda não há login
+      DIAG.dbRead = "auth";
+    } else {
+      DIAG.dbRead = false;
+      DIAG.errors.push("Leitura: " + msg);
+    }
   }
 
   // 5 e 6. Auth + domínio — testa com credencial inválida proposital
@@ -2912,19 +2882,7 @@ async function runDiagnostics(showResult) {
   return DIAG;
 }
 
-/* Link de diagnóstico no rodapé do login se travar conectando */
-(function autoDiagnose() {
-  window.addEventListener("load", () => {
-    setTimeout(async () => {
-      if (FIREBASE_CONNECTED) return;
-      const st = document.getElementById("fb-status");
-      if (!st) return;
-      st.innerHTML = '<i class="fas fa-circle" style="color:var(--bad);font-size:0.55rem"></i> ' +
-        '<a href="#" onclick="runDiagnostics(true);return false" style="color:var(--bad)">Falha na conexão — clique para diagnosticar</a>';
-      await runDiagnostics(false);
-    }, 5000);
-  });
-})();
+/* autoDiagnose desativado */
 
 </script>
 </body>
