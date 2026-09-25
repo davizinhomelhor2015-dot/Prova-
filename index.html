@@ -1380,6 +1380,7 @@ async function renderDashboard() {
 
 /* ---- Candidatos ---- */
 async function renderCandidatos() {
+  try {
   const [usersSnap, examsSnap, attemptsSnap] = await Promise.all([
     db.ref("users").once("value"),
     db.ref("exams").once("value"),
@@ -1432,6 +1433,15 @@ async function renderCandidatos() {
         </table>
       </div>
     </div>`;
+  } catch (err) {
+    console.error("renderCandidatos:", err);
+    document.getElementById("admin-view-root").innerHTML = `
+      <div class="empty-state" style="padding:60px 24px">
+        <i class="fas fa-exclamation-triangle" style="color:var(--bad)"></i>
+        <h3>Erro ao carregar candidatos</h3>
+        <p>${escapeHtml(fbErrorMsg(err))}</p>
+      </div>`;
+  }
 }
 
 function openCreateCandidateModal() {
@@ -1485,51 +1495,126 @@ async function submitCreateCandidate() {
 }
 
 async function toggleBlockCandidate(uid, newStatus) {
-  await db.ref("users/" + uid + "/status").set(newStatus);
-  await logAudit(CURRENT_PROFILE.username, newStatus === "bloqueado" ? "bloquear_candidato" : "desbloquear_candidato", uid, "");
-  toast(newStatus === "bloqueado" ? "Candidato bloqueado." : "Candidato desbloqueado.", "good");
-  renderCandidatos();
+  try {
+    await db.ref("users/" + uid + "/status").set(newStatus);
+    await logAudit(CURRENT_PROFILE.username, newStatus === "bloqueado" ? "bloquear_candidato" : "desbloquear_candidato", uid, "");
+    toast(newStatus === "bloqueado" ? "Candidato bloqueado." : "Candidato desbloqueado.", "good");
+    renderCandidatos();
+  } catch (err) {
+    console.error("toggleBlockCandidate:", err);
+    toast(fbErrorMsg(err), "error");
+  }
 }
 
 function deleteCandidate(uid, username) {
   confirmAction("Excluir candidato", `Tem certeza que deseja excluir "${username}"? O acesso será removido.`, async () => {
-    await db.ref("users/" + uid).remove();
-    await logAudit(CURRENT_PROFILE.username, "excluir_candidato", username, "Perfil removido");
-    toast("Candidato excluído.", "good");
-    renderCandidatos();
+    try {
+      await db.ref("users/" + uid).remove();
+      await logAudit(CURRENT_PROFILE.username, "excluir_candidato", username, "Perfil removido");
+      toast("Candidato excluído.", "good");
+      renderCandidatos();
+    } catch (err) {
+      console.error("deleteCandidate:", err);
+      toast(fbErrorMsg(err), "error");
+    }
   });
 }
 
 async function openAssignExamModal(uid) {
-  const [examsSnap, userSnap] = await Promise.all([
-    db.ref("exams").once("value"),
-    db.ref("users/" + uid).once("value")
-  ]);
-  const exams = examsSnap.val() || {};
-  const user = userSnap.val();
+  // Feedback imediato enquanto carrega
+  openModal(`<div style="text-align:center;padding:30px 10px">
+    <i class="fas fa-spinner fa-spin" style="font-size:1.6rem;color:var(--accent-2)"></i>
+    <p class="muted small" style="margin-top:12px">Carregando provas...</p>
+  </div>`);
+
+  let exams = {}, user = null;
+  try {
+    const [examsSnap, userSnap] = await Promise.all([
+      db.ref("exams").once("value"),
+      db.ref("users/" + uid).once("value")
+    ]);
+    exams = examsSnap.val() || {};
+    user  = userSnap.val();
+  } catch (err) {
+    console.error("openAssignExamModal:", err);
+    openModal(`
+      <h2><i class="fas fa-exclamation-triangle" style="margin-right:8px;color:var(--bad)"></i>Erro ao carregar</h2>
+      <p class="muted" style="margin:14px 0">${escapeHtml(fbErrorMsg(err))}</p>
+      <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Fechar</button></div>`);
+    return;
+  }
+
+  if (!user) {
+    openModal(`
+      <h2><i class="fas fa-exclamation-triangle" style="margin-right:8px;color:var(--bad)"></i>Candidato não encontrado</h2>
+      <p class="muted" style="margin:14px 0">O perfil deste candidato não existe mais no banco de dados.</p>
+      <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Fechar</button></div>`);
+    return;
+  }
+
+  const examList = Object.entries(exams);
+
+  // Nenhuma prova criada ainda — orienta o admin
+  if (examList.length === 0) {
+    openModal(`
+      <h2><i class="fas fa-clipboard-list" style="margin-right:8px;color:var(--warn)"></i>Nenhuma prova criada</h2>
+      <p class="muted" style="margin:14px 0;line-height:1.7">
+        Para atribuir uma prova a <strong style="color:var(--text)">${escapeHtml(user.fullName || user.username)}</strong>,
+        primeiro é preciso criar uma prova no banco.
+      </p>
+      <div class="info-msg" style="margin-bottom:0">
+        <i class="fas fa-info-circle"></i>
+        <span>Vá em <strong>Provas → Nova prova</strong>, dê um título, selecione as perguntas e salve. Depois volte aqui.</span>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="closeModal();navigateTo('provas')"><i class="fas fa-plus"></i> Ir para Provas</button>
+      </div>`);
+    return;
+  }
+
   openModal(`
     <h2><i class="fas fa-link" style="margin-right:8px;color:var(--accent-2)"></i>Atribuir prova</h2>
-    <p class="small muted" style="margin-bottom:12px">Candidato: <strong style="color:var(--text)">${escapeHtml(user.fullName)}</strong></p>
-    <label>Prova</label>
+    <p class="small muted" style="margin-bottom:14px">Candidato: <strong style="color:var(--text)">${escapeHtml(user.fullName || user.username)}</strong></p>
+    <label>Prova (${examList.length} disponível(is))</label>
     <select id="assign-exam-select">
       <option value="">— Nenhuma —</option>
-      ${Object.entries(exams).map(([id, ex]) =>
-        `<option value="${id}" ${user.assignedExamId === id ? "selected" : ""}>${escapeHtml(ex.title)}</option>`
+      ${examList.map(([id, ex]) =>
+        `<option value="${id}" ${user.assignedExamId === id ? "selected" : ""}>${escapeHtml(ex.title || "(sem título)")} · ${(ex.questionIds||[]).length} pergunta(s)</option>`
       ).join("")}
     </select>
+    <div id="assign-error"></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-primary" onclick="submitAssignExam('${uid}')"><i class="fas fa-check"></i> Salvar</button>
+      <button class="btn btn-primary" id="assign-save-btn" onclick="submitAssignExam('${uid}')"><i class="fas fa-check"></i> Salvar</button>
     </div>`);
 }
 
 async function submitAssignExam(uid) {
-  const examId = document.getElementById("assign-exam-select").value || null;
-  await db.ref("users/" + uid + "/assignedExamId").set(examId);
-  await logAudit(CURRENT_PROFILE.username, "atribuir_prova", uid, examId || "removida");
-  closeModal();
-  toast("Prova atribuída.", "good");
-  renderCandidatos();
+  const sel = document.getElementById("assign-exam-select");
+  const errBox = document.getElementById("assign-error");
+  const btn = document.getElementById("assign-save-btn");
+  if (!sel) return;
+
+  const examId = sel.value || null;
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...'; }
+  if (errBox) errBox.innerHTML = "";
+
+  try {
+    await db.ref("users/" + uid + "/assignedExamId").set(examId);
+    await logAudit(CURRENT_PROFILE.username, "atribuir_prova", uid, examId || "removida");
+    closeModal();
+    toast(examId ? "Prova atribuída com sucesso." : "Prova removida do candidato.", "good");
+    renderCandidatos();
+  } catch (err) {
+    console.error("submitAssignExam:", err);
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Salvar'; }
+    if (errBox) {
+      errBox.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-circle"></i> ${escapeHtml(fbErrorMsg(err))}</div>`;
+    } else {
+      toast(fbErrorMsg(err), "error");
+    }
+  }
 }
 
 async function openCandidateHistory(uid) {
@@ -1739,17 +1824,22 @@ async function submitQuestion(id) {
     data.options = opts;
     data.correctIndex = Number(correctRadio.value);
   }
-  if (id) {
-    await db.ref("questions/" + id).update(data);
-    await logAudit(CURRENT_PROFILE.username, "editar_pergunta", id, "");
-  } else {
-    data.createdAt = nowTs();
-    await db.ref("questions/" + genId("q")).set(data);
-    await logAudit(CURRENT_PROFILE.username, "criar_pergunta", "", text.slice(0, 60));
+  try {
+    if (id) {
+      await db.ref("questions/" + id).update(data);
+      await logAudit(CURRENT_PROFILE.username, "editar_pergunta", id, "");
+    } else {
+      data.createdAt = nowTs();
+      await db.ref("questions/" + genId("q")).set(data);
+      await logAudit(CURRENT_PROFILE.username, "criar_pergunta", "", text.slice(0, 60));
+    }
+    closeModal();
+    toast("Pergunta salva.", "good");
+    renderPerguntas();
+  } catch (err) {
+    console.error("submitQuestion:", err);
+    errBox.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-circle"></i> ${escapeHtml(fbErrorMsg(err))}</div>`;
   }
-  closeModal();
-  toast("Pergunta salva.", "good");
-  renderPerguntas();
 }
 
 async function duplicateQuestion(id) {
@@ -1765,15 +1855,21 @@ async function duplicateQuestion(id) {
 
 function deleteQuestion(id) {
   confirmAction("Excluir pergunta", "Esta pergunta será removida de provas futuras. Continuar?", async () => {
-    await db.ref("questions/" + id).remove();
-    await logAudit(CURRENT_PROFILE.username, "excluir_pergunta", id, "");
-    toast("Pergunta excluída.", "good");
-    renderPerguntas();
+    try {
+      await db.ref("questions/" + id).remove();
+      await logAudit(CURRENT_PROFILE.username, "excluir_pergunta", id, "");
+      toast("Pergunta excluída.", "good");
+      renderPerguntas();
+    } catch (err) {
+      console.error("deleteQuestion:", err);
+      toast(fbErrorMsg(err), "error");
+    }
   });
 }
 
 /* ---- Provas ---- */
 async function renderProvas() {
+  try {
   const examsSnap = await db.ref("exams").once("value");
   const exams = Object.entries(examsSnap.val() || {});
   document.getElementById("admin-view-root").innerHTML = `
@@ -1805,6 +1901,15 @@ async function renderProvas() {
         </table>
       </div>
     </div>`;
+  } catch (err) {
+    console.error("renderProvas:", err);
+    document.getElementById("admin-view-root").innerHTML = `
+      <div class="empty-state" style="padding:60px 24px">
+        <i class="fas fa-exclamation-triangle" style="color:var(--bad)"></i>
+        <h3>Erro ao carregar provas</h3>
+        <p>${escapeHtml(fbErrorMsg(err))}</p>
+      </div>`;
+  }
 }
 
 async function openExamModal(id) {
@@ -1849,26 +1954,36 @@ async function submitExam(id) {
     errBox.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-circle"></i> Selecione ao menos uma pergunta.</div>`;
     return;
   }
-  if (id) {
-    await db.ref("exams/" + id).update({ title, questionIds });
-    await logAudit(CURRENT_PROFILE.username, "editar_prova", id, title);
-  } else {
-    await db.ref("exams/" + genId("exam")).set({
-      title, questionIds, createdAt: nowTs(), createdBy: CURRENT_PROFILE.username
-    });
-    await logAudit(CURRENT_PROFILE.username, "criar_prova", "", title);
+  try {
+    if (id) {
+      await db.ref("exams/" + id).update({ title, questionIds });
+      await logAudit(CURRENT_PROFILE.username, "editar_prova", id, title);
+    } else {
+      await db.ref("exams/" + genId("exam")).set({
+        title, questionIds, createdAt: nowTs(), createdBy: CURRENT_PROFILE.username
+      });
+      await logAudit(CURRENT_PROFILE.username, "criar_prova", "", title);
+    }
+    closeModal();
+    toast("Prova salva.", "good");
+    renderProvas();
+  } catch (err) {
+    console.error("submitExam:", err);
+    errBox.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-circle"></i> ${escapeHtml(fbErrorMsg(err))}</div>`;
   }
-  closeModal();
-  toast("Prova salva.", "good");
-  renderProvas();
 }
 
 function deleteExam(id) {
   confirmAction("Excluir prova", "Tem certeza que deseja excluir esta prova?", async () => {
-    await db.ref("exams/" + id).remove();
-    await logAudit(CURRENT_PROFILE.username, "excluir_prova", id, "");
-    toast("Prova excluída.", "good");
-    renderProvas();
+    try {
+      await db.ref("exams/" + id).remove();
+      await logAudit(CURRENT_PROFILE.username, "excluir_prova", id, "");
+      toast("Prova excluída.", "good");
+      renderProvas();
+    } catch (err) {
+      console.error("deleteExam:", err);
+      toast(fbErrorMsg(err), "error");
+    }
   });
 }
 
