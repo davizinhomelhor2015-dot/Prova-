@@ -620,9 +620,9 @@ body.exam-lock { -webkit-user-select: none; user-select: none; }
       </div>
       <form id="login-form" autocomplete="off">
         <label for="username"><i class="fas fa-user" style="margin-right:6px;opacity:.6"></i>Usuário</label>
-        <input type="text" id="username" autocomplete="username" required value="alto comando">
+        <input type="text" id="username" autocomplete="username" required placeholder="Seu usuário">
         <label for="password"><i class="fas fa-lock" style="margin-right:6px;opacity:.6"></i>Senha</label>
-        <input type="password" id="password" autocomplete="current-password" required value="1234cmd">
+        <input type="password" id="password" autocomplete="current-password" required placeholder="Sua senha">
         <button type="submit" class="btn btn-primary btn-block" style="margin-top:24px;" id="login-btn">
           <i class="fas fa-sign-in-alt"></i> Entrar
         </button>
@@ -797,6 +797,31 @@ const auth = fbApp.auth();
 const secondaryAuth = fbSecondaryApp.auth();
 const db = fbApp.database();
 
+/* Sessão persistente — o login continua válido ao fechar e reabrir o navegador.
+   O Firebase renova o token automaticamente; a sessão só termina no logout
+   ou quando o limite local de 30 dias é atingido. */
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(e => console.warn("persistence:", e));
+secondaryAuth.setPersistence(firebase.auth.Auth.Persistence.NONE).catch(() => {});
+
+/* Controle de validade da sessão: 30 dias */
+const SESSION_MAX_DAYS = 30;
+const SESSION_KEY = "dp_session_started";
+
+function markSessionStart() {
+  try { localStorage.setItem(SESSION_KEY, String(Date.now())); } catch(e) {}
+}
+function clearSessionMark() {
+  try { localStorage.removeItem(SESSION_KEY); } catch(e) {}
+}
+function sessionExpired() {
+  try {
+    const started = Number(localStorage.getItem(SESSION_KEY) || 0);
+    if (!started) return false;
+    const days = (Date.now() - started) / (1000 * 60 * 60 * 24);
+    return days >= SESSION_MAX_DAYS;
+  } catch(e) { return false; }
+}
+
 // Monitor de conexão Firebase (Realtime Database)
 let FIREBASE_CONNECTED = false;
 db.ref(".info/connected").on("value", (snap) => {
@@ -958,16 +983,37 @@ let LAST_INITED_UID = null;
 function showView(name) {
   document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
   document.getElementById("view-" + name).classList.remove("hidden");
+  // Limpa os campos ao voltar para o login
+  if (name === "login") {
+    const u = document.getElementById("username");
+    const p = document.getElementById("password");
+    if (u) u.value = "";
+    if (p) p.value = "";
+  }
 }
 
 function doLogout() {
   teardownAntiCheat();
   clearInterval(TIMER_INTERVAL);
+  clearSessionMark();
   auth.signOut();
 }
 
 auth.onAuthStateChanged(async (user) => {
   if (BOOTSTRAPPING) return;
+
+  // Sessão com mais de 30 dias → encerra e pede login de novo
+  if (user && sessionExpired()) {
+    clearSessionMark();
+    await auth.signOut();
+    showView("login");
+    const mb = document.getElementById("login-msg");
+    if (mb) mb.innerHTML = '<div class="info-msg"><i class="fas fa-clock"></i> Sua sessão expirou após 30 dias. Faça login novamente.</div>';
+    return;
+  }
+  // Sessão ativa sem marca de início (ex.: sessão antiga) → marca agora
+  if (user && !localStorage.getItem(SESSION_KEY)) markSessionStart();
+
   if (!user) {
     CURRENT_USER = null; CURRENT_PROFILE = null; LAST_INITED_UID = null;
     showView(location.hash === "#bootstrap" ? "bootstrap" : "login");
@@ -1147,6 +1193,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
     // Garante que o perfil existe no banco com role=admin
     if (isDefaultAdmin) await ensureAdminProfile(cred.user);
 
+    markSessionStart();
     const profile = await getUserProfile(cred.user.uid);
     if (profile) logAudit(profile.username, "login", profile.role, `Login (${profile.role})`);
   } catch (err) {
