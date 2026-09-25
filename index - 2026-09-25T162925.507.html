@@ -1,0 +1,2931 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DP PROVA MAJOR GENERAL — Sistema de Avaliação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+/* ============================================================
+   DP PROVA MAJOR GENERAL v2 — Design System aprimorado
+   ============================================================ */
+:root {
+  --bg: #070a10;
+  --bg-elev: #0e131c;
+  --bg-elev-2: #151c2a;
+  --bg-elev-3: #1c2538;
+  --border: #243049;
+  --border-soft: #1a2336;
+  --text: #eef2f9;
+  --text-dim: #8b9bb8;
+  --text-faint: #5a6a88;
+  --accent: #3b7cff;
+  --accent-2: #5b9aff;
+  --accent-soft: rgba(59,124,255,0.14);
+  --accent-glow: rgba(59,124,255,0.35);
+  --good: #22c55e;
+  --good-soft: rgba(34,197,94,0.14);
+  --warn: #f59e0b;
+  --warn-soft: rgba(245,158,11,0.14);
+  --bad: #ef4444;
+  --bad-soft: rgba(239,68,68,0.14);
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 12px 40px rgba(0,0,0,0.45);
+  --shadow-sm: 0 4px 16px rgba(0,0,0,0.25);
+  --transition: 0.18s ease;
+  font-size: 16px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+  min-height: 100%;
+}
+a { color: var(--accent-2); text-decoration: none; transition: color var(--transition); }
+a:hover { color: #7eb0ff; }
+::selection { background: var(--accent-soft); color: var(--text); }
+.hidden { display: none !important; }
+
+/* ---------- Layout ---------- */
+.centered-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(ellipse 80% 50% at 15% 10%, rgba(59,124,255,0.12), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 85% 90%, rgba(59,124,255,0.08), transparent 45%),
+    var(--bg);
+}
+.app-shell { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--bg-elev);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  transition: transform 0.25s ease;
+  z-index: 50;
+}
+.sidebar-brand {
+  padding: 4px 20px 22px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
+}
+.sidebar-brand .logo-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sidebar-brand .crest {
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), #1e4db8);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 0.95rem;
+  box-shadow: 0 4px 14px var(--accent-glow);
+}
+.sidebar-brand .badge-name { font-weight: 700; font-size: 0.92rem; letter-spacing: 0.01em; }
+.sidebar-brand .badge-sub { color: var(--text-dim); font-size: 0.72rem; margin-top: 2px; }
+
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 20px;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  font-size: 0.9rem;
+  font-weight: 500;
+  user-select: none;
+  transition: all var(--transition);
+}
+.nav-item:hover { background: var(--bg-elev-2); color: var(--text); }
+.nav-item.active {
+  background: var(--accent-soft);
+  color: var(--accent-2);
+  border-left-color: var(--accent);
+  font-weight: 600;
+}
+.nav-item .icon { width: 20px; text-align: center; font-size: 0.95rem; opacity: 0.9; }
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 14px 20px 0;
+  border-top: 1px solid var(--border);
+}
+.main-content { flex: 1; min-width: 0; padding: 28px 32px 64px; }
+.mobile-topbar { display: none; }
+
+/* ---------- Cards & Stats ---------- */
+.card {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+}
+.card + .card { margin-top: 16px; }
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.stat-card {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  transition: border-color var(--transition), transform var(--transition);
+}
+.stat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.stat-card .stat-label {
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+.stat-card .stat-value {
+  font-size: 1.85rem;
+  font-weight: 800;
+  margin-top: 8px;
+  letter-spacing: -0.02em;
+}
+.stat-card .stat-value.good { color: var(--good); }
+.stat-card .stat-value.warn { color: var(--warn); }
+.stat-card .stat-value.bad { color: var(--bad); }
+.stat-card .stat-icon {
+  float: right;
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.95rem;
+  background: var(--accent-soft);
+  color: var(--accent-2);
+}
+
+/* ---------- Login ---------- */
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 40px 36px;
+  box-shadow: var(--shadow);
+}
+.login-brand { text-align: center; margin-bottom: 32px; }
+.login-brand .crest {
+  width: 72px; height: 72px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--accent), #1e4db8);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+  font-weight: 800; font-size: 1.4rem;
+  box-shadow: 0 8px 28px var(--accent-glow);
+}
+.login-brand h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: 0.02em; }
+.login-brand p { color: var(--text-dim); font-size: 0.82rem; margin-top: 6px; }
+
+/* ---------- Forms ---------- */
+label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-bottom: 7px;
+  margin-top: 16px;
+  font-weight: 500;
+}
+label:first-of-type { margin-top: 0; }
+input[type=text], input[type=password], input[type=number], input[type=email], select, textarea {
+  width: 100%;
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.92rem;
+  font-family: inherit;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+textarea { resize: vertical; min-height: 90px; }
+input::placeholder, textarea::placeholder { color: var(--text-faint); }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-elev-2);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: filter var(--transition), transform var(--transition), background var(--transition);
+}
+.btn:hover { filter: brightness(1.12); }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #2a5fd4);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 14px var(--accent-glow);
+}
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-good { background: var(--good); border-color: transparent; color: #052e16; }
+.btn-bad { background: var(--bad); border-color: transparent; color: #fff; }
+.btn-ghost { background: transparent; }
+.btn-block { width: 100%; }
+.btn-sm { padding: 7px 12px; font-size: 0.78rem; border-radius: 8px; }
+
+/* ---------- Messages ---------- */
+.error-msg, .info-msg, .success-msg {
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  margin-top: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.error-msg { background: var(--bad-soft); color: #ff9a94; border: 1px solid rgba(239,68,68,0.35); }
+.info-msg { background: var(--accent-soft); color: var(--accent-2); border: 1px solid rgba(59,124,255,0.35); }
+.success-msg { background: var(--good-soft); color: #6ee7a0; border: 1px solid rgba(34,197,94,0.35); }
+
+/* ---------- Tables ---------- */
+.table-wrap { overflow-x: auto; border-radius: var(--radius-sm); }
+table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 560px; }
+th {
+  text-align: left;
+  color: var(--text-dim);
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  background: var(--bg-elev-2);
+}
+td { padding: 13px 14px; border-bottom: 1px solid var(--border-soft); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tbody tr { transition: background var(--transition); }
+tbody tr:hover td { background: var(--bg-elev-2); }
+
+/* ---------- Pills ---------- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.pill-good { background: var(--good-soft); color: #6ee7a0; }
+.pill-warn { background: var(--warn-soft); color: #fbbf24; }
+.pill-bad { background: var(--bad-soft); color: #fca5a5; }
+.pill-neutral { background: var(--bg-elev-2); color: var(--text-dim); border: 1px solid var(--border); }
+
+/* ---------- Modal ---------- */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(3,5,10,0.72);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; z-index: 200;
+  animation: fadeIn 0.15s ease;
+}
+.modal {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 580px;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 28px;
+  animation: slideUp 0.2s ease;
+}
+.modal h2 { margin: 0 0 6px; font-size: 1.15rem; font-weight: 700; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ---------- Helpers ---------- */
+.flex-between { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.muted { color: var(--text-dim); }
+.small { font-size: 0.8rem; }
+.section-title { font-size: 1.05rem; font-weight: 700; margin: 0 0 4px; }
+.section-desc { color: var(--text-dim); font-size: 0.83rem; margin: 0 0 18px; }
+.topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 26px; gap: 12px; flex-wrap: wrap; }
+.topbar h1 { font-size: 1.45rem; font-weight: 800; letter-spacing: -0.02em; }
+.topbar .subtitle { color: var(--text-dim); font-size: 0.85rem; margin-top: 3px; }
+
+/* ---------- Search bar ---------- */
+.search-bar {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0 14px;
+  max-width: 280px;
+}
+.search-bar i { color: var(--text-faint); font-size: 0.85rem; }
+.search-bar input {
+  border: none; background: transparent; padding: 10px 0;
+  box-shadow: none !important;
+}
+.search-bar input:focus { box-shadow: none !important; }
+
+/* ---------- Exam ---------- */
+.exam-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  position: relative;
+}
+.exam-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 28px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-elev);
+  gap: 12px; flex-wrap: wrap;
+  position: relative; z-index: 20;
+}
+.exam-progress-text { color: var(--text-dim); font-size: 0.83rem; margin-top: 2px; }
+.exam-progress-bar {
+  height: 4px;
+  background: var(--bg-elev-2);
+  border-radius: 2px;
+  margin-top: 10px;
+  overflow: hidden;
+  max-width: 320px;
+}
+.exam-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  border-radius: 2px;
+  transition: width 0.35s ease;
+}
+.timer-badge {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+  transition: all var(--transition);
+}
+.timer-badge.low {
+  background: var(--bad-soft);
+  color: #fca5a5;
+  border-color: rgba(239,68,68,0.45);
+  animation: pulse 1s ease infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+}
+
+.exam-body {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 36px 20px 48px;
+  position: relative; z-index: 10;
+}
+.question-card {
+  width: 100%;
+  max-width: 740px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+  animation: slideUp 0.25s ease;
+}
+.question-index {
+  color: var(--accent-2);
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.question-text {
+  font-size: 1.08rem;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  margin-bottom: 26px;
+  font-weight: 500;
+}
+.option-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  background: var(--bg-elev-2);
+}
+.option-row:hover { border-color: var(--accent); background: var(--accent-soft); }
+.option-row.selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.option-row .opt-letter {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.85rem;
+  flex-shrink: 0;
+  transition: all var(--transition);
+}
+.option-row.selected .opt-letter {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.option-row input { display: none; }
+
+.exam-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 28px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-elev);
+  gap: 10px; flex-wrap: wrap;
+  position: relative; z-index: 20;
+}
+.security-strip {
+  font-size: 0.7rem;
+  color: var(--text-faint);
+  padding: 7px 28px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-elev);
+  text-align: center;
+  position: relative; z-index: 20;
+}
+
+/* Watermark */
+.watermark-layer {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  overflow: hidden;
+}
+.watermark-text {
+  position: absolute;
+  color: rgba(255,255,255,0.04);
+  font-size: 0.95rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transform: rotate(-24deg);
+  transition: top 1.4s ease, left 1.4s ease;
+  user-select: none;
+  line-height: 1.5;
+}
+
+.blocked-overlay {
+  position: fixed; inset: 0;
+  background: rgba(4,6,12,0.94);
+  z-index: 300;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center;
+  padding: 30px;
+}
+.blocked-overlay .card { max-width: 460px; }
+
+body.exam-lock { -webkit-user-select: none; user-select: none; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* Toast */
+#toast-box {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+.toast-item {
+  padding: 13px 18px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.45);
+  color: #fff;
+  animation: slideUp 0.25s ease;
+  pointer-events: auto;
+  display: flex; align-items: center; gap: 10px;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-dim);
+}
+.empty-state i { font-size: 2.8rem; margin-bottom: 14px; opacity: 0.4; }
+.empty-state h3 { color: var(--text); font-size: 1.1rem; margin-bottom: 6px; }
+
+/* Mobile */
+@media (max-width: 900px) {
+  .sidebar {
+    position: fixed; left: 0; top: 0;
+    transform: translateX(-100%);
+    box-shadow: var(--shadow);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .app-shell { display: block; }
+  .main-content { padding: 20px 16px 60px; }
+  .mobile-topbar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    background: var(--bg-elev);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 40;
+  }
+  .mobile-topbar .badge-name { font-weight: 700; font-size: 0.9rem; }
+  .sidebar-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55); z-index: 45;
+  }
+  .sidebar-overlay.show { display: block; }
+  table { min-width: 480px; }
+}
+@media (max-width: 600px) {
+  .question-card { padding: 22px; }
+  .exam-header, .exam-footer { padding: 12px 16px; }
+  .login-card { padding: 30px 22px; }
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ========== LOGIN ========== -->
+<div id="view-login" class="view">
+  <div class="centered-shell">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="crest">DP</div>
+        <h1>DP PROVA MAJOR GENERAL</h1>
+        <p>Sistema de Avaliação Institucional</p>
+      </div>
+      <form id="login-form" autocomplete="off">
+        <label for="username"><i class="fas fa-user" style="margin-right:6px;opacity:.6"></i>Usuário</label>
+        <input type="text" id="username" autocomplete="username" required value="alto comando">
+        <label for="password"><i class="fas fa-lock" style="margin-right:6px;opacity:.6"></i>Senha</label>
+        <input type="password" id="password" autocomplete="current-password" required value="1234cmd">
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:24px;" id="login-btn">
+          <i class="fas fa-sign-in-alt"></i> Entrar
+        </button>
+      </form>
+      <div id="login-msg"></div>
+      <p class="muted small" id="fb-status" style="text-align:center;margin-top:18px;font-size:0.75rem">
+        <i class="fas fa-circle" style="color:var(--text-faint);font-size:0.55rem"></i> Conectando ao Firebase...
+      </p>
+      <p style="text-align:center;margin-top:8px;font-size:0.72rem">
+        <a href="#" onclick="runDiagnostics(true);return false" style="color:var(--text-faint);text-decoration:none">
+          <i class="fas fa-stethoscope" style="margin-right:4px"></i>Diagnosticar conexão
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ========== BOOTSTRAP ========== -->
+<div id="view-bootstrap" class="view hidden">
+  <div class="centered-shell">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="crest">DP</div>
+        <h1>Configuração inicial</h1>
+        <p>Criar a primeira conta de administrador</p>
+      </div>
+      <div class="error-msg" style="margin-bottom:18px">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>Use apenas <strong>uma vez</strong>. Qualquer pessoa com acesso a esta tela pode criar um admin.</span>
+      </div>
+      <form id="bootstrap-form">
+        <label>Nome completo</label>
+        <input type="text" id="b-fullname" required placeholder="Nome completo">
+        <label>Usuário (login)</label>
+        <input type="text" id="b-username" required placeholder="usuario.admin">
+        <label>Senha</label>
+        <input type="password" id="b-password" required placeholder="Mínimo 6 caracteres">
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:22px">
+          <i class="fas fa-user-shield"></i> Criar administrador
+        </button>
+      </form>
+      <div id="bootstrap-msg"></div>
+      <p class="muted small" style="text-align:center;margin-top:18px">
+        <a href="#" onclick="showView('login');return false;"><i class="fas fa-arrow-left"></i> Voltar ao login</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ADMIN ========== -->
+<div id="view-admin" class="view hidden">
+  <div class="app-shell">
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="logo-row">
+          <div class="crest">DP</div>
+          <div>
+            <div class="badge-name">DP PROVA</div>
+            <div class="badge-sub">Painel Administrativo</div>
+          </div>
+        </div>
+      </div>
+      <nav id="nav-list">
+        <div class="nav-item" data-view="dashboard"><span class="icon"><i class="fas fa-chart-pie"></i></span> Dashboard</div>
+        <div class="nav-item" data-view="candidatos"><span class="icon"><i class="fas fa-users"></i></span> Candidatos</div>
+        <div class="nav-item" data-view="perguntas"><span class="icon"><i class="fas fa-question-circle"></i></span> Perguntas</div>
+        <div class="nav-item" data-view="provas"><span class="icon"><i class="fas fa-clipboard-list"></i></span> Provas</div>
+        <div class="nav-item" data-view="resultados"><span class="icon"><i class="fas fa-trophy"></i></span> Resultados</div>
+        <div class="nav-item" data-view="seguranca"><span class="icon"><i class="fas fa-shield-alt"></i></span> Segurança</div>
+        <div class="nav-item" data-view="configuracoes"><span class="icon"><i class="fas fa-cog"></i></span> Configurações</div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="small muted" id="admin-name-label" style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
+          <i class="fas fa-user-circle"></i> <span>—</span>
+        </div>
+        <button class="btn btn-ghost btn-block" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+      </div>
+    </aside>
+    <div style="flex:1;min-width:0">
+      <div class="mobile-topbar">
+        <button class="btn btn-sm" onclick="openSidebar()"><i class="fas fa-bars"></i></button>
+        <span class="badge-name">DP PROVA MAJOR GENERAL</span>
+      </div>
+      <main class="main-content" id="admin-view-root">
+        <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><h3>Carregando...</h3></div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- ========== EXAM ========== -->
+<div id="view-exam" class="view hidden">
+  <div class="exam-shell">
+    <div class="watermark-layer" id="watermark-layer"></div>
+    <div class="exam-header">
+      <div style="flex:1;min-width:0">
+        <strong id="exam-title" style="font-size:0.95rem">DP PROVA MAJOR GENERAL</strong>
+        <div class="exam-progress-text" id="exam-progress">Carregando...</div>
+        <div class="exam-progress-bar"><div class="exam-progress-fill" id="exam-progress-fill" style="width:0%"></div></div>
+      </div>
+      <div class="timer-badge" id="timer-badge"><i class="fas fa-clock"></i> <span>--:--</span></div>
+    </div>
+    <div class="exam-body" id="exam-body">
+      <div class="question-card"><p class="muted" style="text-align:center"><i class="fas fa-spinner fa-spin"></i> Carregando avaliação...</p></div>
+    </div>
+    <div class="exam-footer" id="exam-footer" style="display:none">
+      <span class="small muted" id="autosave-label"><i class="fas fa-check-circle" style="color:var(--good);margin-right:4px"></i>Salvo automaticamente</span>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost" id="prev-btn" onclick="prevQuestion()" style="display:none"><i class="fas fa-arrow-left"></i> Anterior</button>
+        <button class="btn btn-primary" id="next-btn" onclick="submitCurrentAnswer()"><i class="fas fa-arrow-right"></i> Próxima</button>
+      </div>
+    </div>
+    <div class="security-strip">
+      <i class="fas fa-shield-alt" style="margin-right:6px"></i>
+      Ambiente monitorado · Trocas de aba, perda de foco e saída da tela cheia são registradas
+    </div>
+  </div>
+</div>
+
+
+<!-- ========== SETUP WIZARD ========== -->
+<div id="view-setup" class="view hidden">
+  <div style="min-height:100vh;display:flex;flex-direction:column;background:var(--bg)">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:var(--bg-elev);border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#1e4db8);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;color:#fff;box-shadow:0 4px 14px var(--accent-glow)">DP</div>
+        <span style="font-weight:700;font-size:.95rem">DP PROVA — Configuração do Firebase</span>
+      </div>
+      <button class="btn btn-sm btn-ghost" onclick="showView('login')"><i class="fas fa-times"></i> Fechar</button>
+    </div>
+    <div style="height:3px;background:var(--bg-elev-2)">
+      <div id="setup-prog" style="height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .4s;width:0%"></div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:32px 20px 100px">
+      <div id="setup-body" style="max-width:680px;margin:0 auto"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 28px;background:var(--bg-elev);border-top:1px solid var(--border);gap:12px;position:sticky;bottom:0;z-index:10">
+      <button class="btn btn-ghost" id="setup-prev" onclick="setupNav(-1)" style="display:none"><i class="fas fa-arrow-left"></i> Anterior</button>
+      <span id="setup-step-label" class="muted small" style="flex:1;text-align:center"></span>
+      <button class="btn btn-primary" id="setup-next" onclick="setupNav(1)">Próximo <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== BOTÃO FLUTUANTE AJUDA ========== -->
+<div id="help-fab" style="display:none;position:fixed;bottom:24px;right:24px;z-index:400">
+  <button onclick="openSetupGuide(0)" title="Guia de configuração" style="width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--accent),#1e4db8);color:#fff;font-size:1.05rem;box-shadow:0 4px 20px var(--accent-glow);display:flex;align-items:center;justify-content:center;transition:transform .18s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><i class="fas fa-question"></i></button>
+  <div id="help-fab-badge" class="hidden" style="position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:var(--bad);border:2px solid var(--bg)"></div>
+</div>
+
+<div id="modal-root"></div>
+<div id="blocked-root"></div>
+<div id="toast-box"></div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+/* ============================================================
+   CONFIGURAÇÃO FIREBASE
+   ============================================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyBxtNGd2Gwi4KB-md_wQE4WdaDFJ43tXtc",
+  authDomain: "fir-46274.firebaseapp.com",
+  databaseURL: "https://fir-46274-default-rtdb.firebaseio.com",
+  projectId: "fir-46274",
+  storageBucket: "fir-46274.firebasestorage.app",
+  messagingSenderId: "1058624496135",
+  appId: "1:1058624496135:web:b24174326134715e66c0a2",
+  measurementId: "G-EPY7P7QZQP"
+};
+
+const fbApp = firebase.initializeApp(firebaseConfig);
+const fbSecondaryApp = firebase.initializeApp(firebaseConfig, "Secondary");
+const auth = fbApp.auth();
+const secondaryAuth = fbSecondaryApp.auth();
+const db = fbApp.database();
+
+// Monitor de conexão Firebase (Realtime Database)
+let FIREBASE_CONNECTED = false;
+db.ref(".info/connected").on("value", (snap) => {
+  FIREBASE_CONNECTED = snap.val() === true;
+  const el = document.getElementById("fb-status");
+  if (el) {
+    el.innerHTML = FIREBASE_CONNECTED
+      ? '<i class="fas fa-circle" style="color:var(--good);font-size:0.55rem"></i> Firebase online'
+      : '<i class="fas fa-circle" style="color:var(--bad);font-size:0.55rem"></i> Firebase offline';
+  }
+});
+
+function usernameToEmail(username) {
+  return username.trim().toLowerCase().replace(/[^a-z0-9._-]/g, "") + "@dplynwood.local";
+}
+
+function fbErrorMsg(err) {
+  if (!err) return "Erro desconhecido.";
+  const code = err.code || "";
+  const msg  = err.message || "";
+  if (code === "PERMISSION_DENIED" || msg.includes("PERMISSION_DENIED")) {
+    if (typeof alertHelpFab !== "undefined") alertHelpFab();
+    return "Permissão negada. Clique no botão ? (ajuda) e aplique as regras do Firebase.";
+  }
+  if (code === "auth/network-request-failed")  return "Sem conexão com a internet / Firebase.";
+  if (code === "auth/too-many-requests")        return "Muitas tentativas. Aguarde um momento.";
+  if (["auth/user-not-found","auth/wrong-password","auth/invalid-credential",
+       "auth/invalid-login-credentials"].includes(code)) return "Usuário ou senha inválidos.";
+  if (code === "auth/email-already-in-use")     return "Esse usuário já existe no sistema.";
+  if (code === "auth/weak-password")            return "Senha muito fraca (mínimo 6 caracteres).";
+  if (code === "auth/requires-recent-login")    return "Por segurança, saia e entre novamente.";
+  if (code === "auth/user-disabled")            return "Esta conta foi desativada.";
+  if (code === "auth/operation-not-allowed")    return "E-mail/senha não ativado no Firebase. Veja o guia (?).";
+  if (code === "auth/api-key-not-valid")        return "Chave de API inválida no firebaseConfig.";
+  if (code === "auth/unauthorized-domain") {
+    showDomainFix();
+    return "Domínio não autorizado no Firebase. Veja as instruções na tela.";
+  }
+  if (msg.includes("index not defined"))        return "Índice não configurado — aplique as regras completas via guia (?).";
+  return msg || "Erro ao comunicar com o Firebase.";
+}
+
+/* ============================================================
+   UTILITÁRIOS
+   ============================================================ */
+function nowTs() { return Date.now(); }
+function fmtDateTime(ts) {
+  if (!ts) return "—";
+  return new Date(ts).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+function fmtSeconds(totalSeconds) {
+  totalSeconds = Math.max(0, Math.round(totalSeconds));
+  const m = Math.floor(totalSeconds / 60), s = totalSeconds % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+function shuffleArray(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function escapeHtml(str) {
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+function genId(prefix) {
+  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+}
+
+function logAudit(actor, action, target, details) {
+  return db.ref("auditLogs/" + genId("audit")).set({
+    actor: actor || "desconhecido",
+    action, target: target || "", details: details || "",
+    timestamp: nowTs()
+  }).catch(e => console.error(e));
+}
+function logSecurityEvent(attemptId, userId, type, details) {
+  return db.ref("securityEvents/" + genId("sec")).set({
+    attemptId: attemptId || "", userId: userId || "",
+    type, details: details || "", timestamp: nowTs()
+  }).catch(e => console.error(e));
+}
+async function getUserProfile(uid) {
+  const snap = await db.ref("users/" + uid).once("value");
+  return snap.val();
+}
+
+function toast(msg, type = "info") {
+  const el = document.getElementById("toast-box");
+  const t = document.createElement("div");
+  t.className = "toast-item";
+  const colors = { error: "#ef4444", good: "#22c55e", info: "#3b7cff" };
+  const icons = { error: "fa-times-circle", good: "fa-check-circle", info: "fa-info-circle" };
+  t.style.background = colors[type] || colors.info;
+  t.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i> ${escapeHtml(msg)}`;
+  el.appendChild(t);
+  setTimeout(() => { t.style.opacity = "0"; t.style.transition = "opacity 0.3s"; setTimeout(() => t.remove(), 300); }, 3200);
+}
+
+function closeModal() { document.getElementById("modal-root").innerHTML = ""; }
+function openModal(html) {
+  document.getElementById("modal-root").innerHTML =
+    `<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal">${html}</div></div>`;
+}
+
+function confirmAction(title, message, onConfirm) {
+  openModal(`
+    <h2>${escapeHtml(title)}</h2>
+    <p class="muted" style="margin:12px 0 0">${escapeHtml(message)}</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-bad" id="confirm-yes">Confirmar</button>
+    </div>`);
+  document.getElementById("confirm-yes").onclick = () => { closeModal(); onConfirm(); };
+}
+
+/* ============================================================
+   24 PERGUNTAS INICIAIS
+   ============================================================ */
+const SEED_QUESTIONS = [
+  { text: "Durante uma ação, um oficial percebe que um companheiro tomou uma decisão que poderia ter sido conduzida de outra maneira. Ele quer dar um feedback, mas o responsável pela equipe entende que aquele não é o momento.\n\nComo você conduziria essa situação para que o feedback seja considerado sem prejudicar a ação ou gerar conflito dentro da equipe?", category: "Liderança", theme: "Feedback em equipe" },
+  { text: "Você está realizando uma abordagem no HP quando percebe que outro cidadão começa a atropelar pessoas nas proximidades.\n\nComo você decide o que fazer primeiro, considerando que abandonar a abordagem pode gerar um problema e ignorar os atropelamentos também pode colocar outras pessoas em risco?", category: "Tomada de decisão", theme: "Priorização de risco" },
+  { text: "Um cidadão está sendo abordado e inicialmente obedece às ordens. Durante a abordagem, porém, ele começa a se afastar e deixa de seguir as instruções dadas.\n\nEm que momento você mudaria sua postura e quais fatores levaria em consideração antes de utilizar algum tipo de força?", category: "Uso da força", theme: "Escalonamento" },
+  { text: "Você precisa tomar uma medida contra um oficial que está há bastante tempo na DP e possui boa relação com a equipe. Porém, o erro cometido foi grave.\n\nO tempo de corporação e a proximidade com os demais oficiais deveriam influenciar sua decisão? Explique como você conduziria a situação.", category: "Liderança", theme: "Imparcialidade" },
+  { text: "Você recebe uma ordem de um superior durante uma ação, mas acredita que existe uma maneira mais segura de executá-la.\n\nVocê seguiria a ordem imediatamente, questionaria antes de agir ou faria de outra maneira? Explique como equilibraria hierarquia, segurança e bom senso.", category: "Hierarquia", theme: "Segurança vs. ordem" },
+  { text: "Você chega para auxiliar uma equipe que já iniciou uma abordagem, mas não sabe exatamente o que aconteceu antes da sua chegada.\n\nVocê seguiria imediatamente o que seus companheiros estão fazendo ou primeiro buscaria entender a situação? Explique sua decisão.", category: "Trabalho em equipe", theme: "Contexto situacional" },
+  { text: "Durante uma perseguição, o suspeito muda completamente de comportamento e passa a obedecer às ordens dos policiais. Alguns integrantes da equipe, porém, continuam utilizando força contra ele.\n\nComo você agiria nesse momento e o que avaliaria antes de tomar uma atitude?", category: "Uso da força", theme: "Proporcionalidade" },
+  { text: "Você percebe que um policial está utilizando força contra um cidadão que, naquele momento, não demonstra representar risco imediato. O policial possui uma patente superior à sua.\n\nComo você lidaria com a situação sem transformar a diferença de patente em motivo para ignorar um possível erro?", category: "Ética", theme: "Hierarquia vs. dever" },
+  { text: "Durante uma perseguição, o suspeito entra em uma área onde a ação policial não deve continuar. Seus companheiros continuam seguindo o suspeito.\n\nVocê acompanharia a equipe ou tentaria interromper a perseguição? Explique como comunicaria sua decisão.", category: "Procedimento", theme: "Limites de ação" },
+  { text: "Durante uma abordagem, o cidadão começa a provocar os policiais. Um dos seus companheiros perde a paciência e começa a responder às provocações.\n\nComo você impediria que a situação evoluísse sem necessidade e, ao mesmo tempo, evitaria criar um conflito com seu próprio companheiro?", category: "Controle emocional", theme: "De-escalonamento" },
+  { text: "Você está em uma VTR e o policial responsável pela abordagem começa a agir de maneira diferente do que foi combinado pela equipe. Você acredita que a atitude dele pode prejudicar a ação, mas ele possui uma patente maior que a sua.\n\nComo você se posicionaria?", category: "Hierarquia", theme: "Comunicação assertiva" },
+  { text: "Durante uma patrulha, o P1 decide desembarcar a equipe em determinado local sem que exista uma necessidade aparente. Você acredita que a decisão pode comprometer a segurança da equipe.\n\nO que você faria e como comunicaria sua preocupação?", category: "Segurança da equipe", theme: "Comunicação de risco" },
+  { text: "Você está como P4 e percebe que a equipe está concentrada no suspeito, enquanto ninguém está cuidando adequadamente do perímetro.\n\nQual seria sua prioridade e por que a função de cada integrante da VTR é importante para o resultado da ação?", category: "Procedimento", theme: "Funções da viatura" },
+  { text: "Durante uma patrulha, seu rádio está sendo utilizado para várias conversas paralelas enquanto você tenta transmitir uma informação importante.\n\nComo você resolveria o problema sem gerar uma discussão dentro da equipe?", category: "Comunicação", theme: "Disciplina de rádio" },
+  { text: "Você presencia um companheiro cometendo uma atitude irregular. Ele percebe que você viu e pede para que você não conte a ninguém, dizendo que foi apenas um erro e que ele possui bastante tempo de corporação.\n\nComo você agiria?", category: "Ética", theme: "Integridade" },
+  { text: "Um cidadão comete uma infração durante uma abordagem, mas também começa a colocar outras pessoas em risco.\n\nComo você definiria a prioridade da sua atuação sem transformar a situação em uma reação desproporcional?", category: "Tomada de decisão", theme: "Proporcionalidade" },
+  { text: "Você recebe uma informação sobre um suspeito por meio de uma conversa fora do RP. Essa informação seria muito útil para localizar o indivíduo, mas seu personagem não teria como saber disso dentro do jogo.\n\nVocê utilizaria essa informação? Explique o motivo.", category: "RP", theme: "Metagaming" },
+  { text: "Você chega a uma situação em que seus companheiros já estão utilizando força contra um cidadão. Você não presenciou o início da ação e não sabe exatamente o que levou a equipe a agir daquela maneira.\n\nO que você faria antes de simplesmente participar da ação?", category: "Uso da força", theme: "Verificação de contexto" },
+  { text: "Durante uma patrulha, o oficial responsável pela equipe determina uma estratégia. Dois integrantes começam a agir por conta própria e deixam de seguir a organização definida.\n\nComo você recuperaria a organização da equipe sem transformar a comunicação em uma discussão?", category: "Liderança", theme: "Coordenação de equipe" },
+  { text: "Você percebe que uma decisão tomada por toda a equipe está levando a situação para um caminho errado, mas ninguém parece ter percebido.\n\nVocê continuaria seguindo a maioria para não quebrar a organização ou tentaria corrigir a situação? Explique principalmente como faria isso.", category: "Pensamento crítico", theme: "Correção de rota" },
+  { text: "Você está em uma equipe com oficiais mais experientes e percebe que um deles está cometendo pequenos erros repetidamente. Nenhum desses erros, isoladamente, parece grave, mas juntos começam a prejudicar o desempenho da equipe.\n\nComo você lidaria com isso sem criar uma situação desnecessária dentro da corporação?", category: "Liderança", theme: "Erros cumulativos" },
+  { text: "Durante uma ação, seu superior recebe duas informações diferentes sobre o mesmo suspeito. Uma delas veio diretamente da equipe e a outra chegou por uma fonte que não deveria influenciar o RP.\n\nComo você avaliaria essas informações antes de decidir o que fazer?", category: "RP", theme: "Fontes de informação" },
+  { text: "Você está comandando uma equipe e percebe que um oficial mais novo está demonstrando insegurança durante uma abordagem. Ao mesmo tempo, a situação está acontecendo rapidamente e você não pode simplesmente parar tudo para dar uma aula.\n\nComo você conduziria a ação e, depois, ajudaria esse oficial a melhorar?", category: "Liderança", theme: "Mentoria" },
+  { text: "Depois de uma ação, você percebe que a equipe conseguiu alcançar o objetivo, mas alguns procedimentos poderiam ter sido melhores. Ninguém foi prejudicado e o resultado final foi positivo.\n\nVocê considera necessário conversar sobre os erros mesmo assim? Como transformaria essa situação em aprendizado para a equipe?", category: "Liderança", theme: "Pós-ação / aprendizado" }
+].map((q, i) => ({
+  text: q.text, category: q.category, theme: q.theme, type: "aberta",
+  options: [], correctIndex: null, score: 10, difficulty: "media",
+  timeSeconds: 90, mandatory: true, active: true, order: i + 1, createdAt: Date.now()
+}));
+
+/* ============================================================
+   ROTEADOR
+   ============================================================ */
+let CURRENT_USER = null;
+let CURRENT_PROFILE = null;
+let BOOTSTRAPPING = false;
+let LAST_INITED_UID = null;
+
+function showView(name) {
+  document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
+  document.getElementById("view-" + name).classList.remove("hidden");
+}
+
+function doLogout() {
+  teardownAntiCheat();
+  clearInterval(TIMER_INTERVAL);
+  auth.signOut();
+}
+
+auth.onAuthStateChanged(async (user) => {
+  if (BOOTSTRAPPING) return;
+  if (!user) {
+    CURRENT_USER = null; CURRENT_PROFILE = null; LAST_INITED_UID = null;
+    showView(location.hash === "#bootstrap" ? "bootstrap" : "login");
+    return;
+  }
+  let profile = await getUserProfile(user.uid);
+
+  // Auto-reparo: se o perfil sumiu mas é o admin padrão, recria
+  if (!profile && user.email === usernameToEmail(DEFAULT_ADMIN.username)) {
+    await ensureAdminProfile(user);
+    profile = await getUserProfile(user.uid);
+  }
+
+  if (!profile) {
+    console.error("Perfil não encontrado para uid:", user.uid);
+    await auth.signOut();
+    showView("login");
+    const mb = document.getElementById("login-msg");
+    if (mb) mb.innerHTML = '<div class="error-msg"><i class="fas fa-exclamation-circle"></i> Perfil não encontrado no banco. Verifique as regras do Firebase.</div>';
+    return;
+  }
+  if (profile.status === "bloqueado") {
+    await auth.signOut();
+    showView("login");
+    const mb = document.getElementById("login-msg");
+    if (mb) mb.innerHTML = '<div class="error-msg"><i class="fas fa-ban"></i> Sua conta está bloqueada.</div>';
+    return;
+  }
+
+  CURRENT_USER = user; CURRENT_PROFILE = profile;
+  if (LAST_INITED_UID === user.uid) {
+    showView(profile.role === "admin" ? "admin" : "exam");
+    return;
+  }
+  LAST_INITED_UID = user.uid;
+
+  if (profile.role === "admin") {
+    document.getElementById("admin-name-label").innerHTML =
+      `<i class="fas fa-user-circle"></i> <span>${escapeHtml(profile.fullName || profile.username)} (admin)</span>`;
+    showView("admin");
+    showHelpFab();
+    await autoSeedIfEmpty();
+    navigateTo("dashboard");
+  } else {
+    showView("exam");
+    try {
+      await initExam();
+    } catch (err) {
+      console.error("initExam:", err);
+      document.getElementById("exam-body").innerHTML = `
+        <div class="question-card" style="text-align:center;padding:48px 32px">
+          <div style="font-size:2rem;margin-bottom:14px;color:var(--bad)"><i class="fas fa-exclamation-triangle"></i></div>
+          <h2 style="margin:0 0 10px">Erro ao carregar a avaliação</h2>
+          <p class="muted" style="max-width:400px;margin:0 auto 20px;line-height:1.6">${escapeHtml(fbErrorMsg(err))}</p>
+          <button class="btn btn-primary" onclick="location.reload()"><i class="fas fa-redo"></i> Tentar novamente</button>
+        </div>`;
+    }
+  }
+});
+
+/* Login */
+/* Conta administrativa padrão — criada automaticamente na primeira vez */
+const DEFAULT_ADMIN = {
+  username: "alto comando",
+  password: "1234cmd",
+  fullName: "Alto Comando"
+};
+
+/* Cria o admin padrão automaticamente se ele ainda não existir no Firebase */
+async function ensureDefaultAdmin() {
+  const email = usernameToEmail(DEFAULT_ADMIN.username);
+  try {
+    // Tenta criar — se já existir, o Firebase retorna email-already-in-use
+    const cred = await secondaryAuth.createUserWithEmailAndPassword(email, DEFAULT_ADMIN.password);
+    await db.ref("users/" + cred.user.uid).set({
+      uid: cred.user.uid,
+      username: DEFAULT_ADMIN.username,
+      fullName: DEFAULT_ADMIN.fullName,
+      role: "admin",
+      status: "ativo",
+      createdAt: nowTs(),
+      createdBy: "auto-bootstrap"
+    });
+    await secondaryAuth.signOut();
+    console.log("[auto-bootstrap] Admin padrão criado com sucesso.");
+    return true;
+  } catch (err) {
+    if (err.code === "auth/email-already-in-use") {
+      console.log("[auto-bootstrap] Admin padrão já existe.");
+      return true;
+    }
+    console.warn("[auto-bootstrap] Não foi possível criar o admin:", err.code || err.message);
+    return false;
+  }
+}
+
+/* Garante que o perfil no banco existe e tem role=admin */
+async function ensureAdminProfile(user) {
+  try {
+    const snap = await db.ref("users/" + user.uid).once("value");
+    const profile = snap.val();
+    if (!profile) {
+      await db.ref("users/" + user.uid).set({
+        uid: user.uid,
+        username: DEFAULT_ADMIN.username,
+        fullName: DEFAULT_ADMIN.fullName,
+        role: "admin",
+        status: "ativo",
+        createdAt: nowTs(),
+        createdBy: "auto-repair"
+      });
+      console.log("[auto-repair] Perfil admin criado no banco.");
+      return true;
+    }
+    if (profile.role !== "admin" && profile.username === DEFAULT_ADMIN.username) {
+      await db.ref("users/" + user.uid + "/role").set("admin");
+      console.log("[auto-repair] Role corrigido para admin.");
+    }
+    if (profile.status === "bloqueado" && profile.username === DEFAULT_ADMIN.username) {
+      await db.ref("users/" + user.uid + "/status").set("ativo");
+      console.log("[auto-repair] Status reativado.");
+    }
+    return true;
+  } catch (e) {
+    console.warn("[auto-repair] Falha:", e);
+    return false;
+  }
+}
+
+/* Carrega as 24 perguntas automaticamente se o banco estiver vazio */
+async function autoSeedIfEmpty() {
+  try {
+    const snap = await db.ref("questions").once("value");
+    if (snap.exists() && Object.keys(snap.val() || {}).length > 0) return;
+    const updates = {};
+    SEED_QUESTIONS.forEach(q => { updates["questions/" + genId("q")] = q; });
+    await db.ref().update(updates);
+    console.log("[auto-seed] 24 perguntas carregadas automaticamente.");
+    toast("24 perguntas carregadas automaticamente.", "good");
+  } catch (e) {
+    console.warn("[auto-seed] Falhou:", e.code || e.message);
+  }
+}
+
+document.getElementById("login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msgBox = document.getElementById("login-msg");
+  msgBox.innerHTML = "";
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value;
+  if (!username || !password) return;
+
+  const btn = document.getElementById("login-btn");
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+
+  const email = usernameToEmail(username);
+  const isDefaultAdmin = (username.trim().toLowerCase() === DEFAULT_ADMIN.username);
+
+  try {
+    let cred;
+    try {
+      cred = await auth.signInWithEmailAndPassword(email, password);
+    } catch (signInErr) {
+      // Conta não existe e é o admin padrão → cria na hora e entra
+      const notFound = ["auth/user-not-found", "auth/invalid-credential", "auth/invalid-login-credentials"].includes(signInErr.code);
+      if (notFound && isDefaultAdmin && password === DEFAULT_ADMIN.password) {
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Configurando conta...';
+        const created = await ensureDefaultAdmin();
+        if (!created) throw signInErr;
+        cred = await auth.signInWithEmailAndPassword(email, password);
+      } else {
+        throw signInErr;
+      }
+    }
+
+    // Garante que o perfil existe no banco com role=admin
+    if (isDefaultAdmin) await ensureAdminProfile(cred.user);
+
+    const profile = await getUserProfile(cred.user.uid);
+    if (profile) logAudit(profile.username, "login", profile.role, `Login (${profile.role})`);
+  } catch (err) {
+    console.error(err);
+    let text = fbErrorMsg(err);
+    if (err.code === "auth/user-disabled") text = "Esta conta foi desativada.";
+    msgBox.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-circle"></i> ${escapeHtml(text)}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+  }
+});
+
+/* Bootstrap */
+document.getElementById("bootstrap-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msgBox = document.getElementById("bootstrap-msg");
+  msgBox.innerHTML = "";
+  const fullName = document.getElementById("b-fullname").value.trim();
+  const username = document.getElementById("b-username").value.trim();
+  const password = document.getElementById("b-password").value;
+  if (password.length < 6) {
+    msgBox.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-circle"></i> Senha deve ter ao menos 6 caracteres.</div>`;
+    return;
+  }
+  BOOTSTRAPPING = true;
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(usernameToEmail(username), password);
+    await db.ref("users/" + cred.user.uid).set({
+      uid: cred.user.uid, username, fullName, role: "admin", status: "ativo",
+      createdAt: nowTs(), createdBy: "bootstrap"
+    });
+    msgBox.innerHTML = `<div class="success-msg"><i class="fas fa-check-circle"></i> Administrador criado! Redirecionando...</div>`;
+    await auth.signOut();
+    BOOTSTRAPPING = false;
+    setTimeout(() => { location.hash = ""; showView("login"); }, 1500);
+  } catch (err) {
+    console.error(err);
+    BOOTSTRAPPING = false;
+    msgBox.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-circle"></i> ${escapeHtml(fbErrorMsg(err))}</div>`;
+  }
+});
+
+/* ============================================================
+   PAINEL ADMIN
+   ============================================================ */
+function openSidebar() {
+  document.getElementById("sidebar").classList.add("open");
+  document.getElementById("sidebar-overlay").classList.add("show");
+}
+function closeSidebar() {
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("sidebar-overlay").classList.remove("show");
+}
+
+document.getElementById("nav-list").addEventListener("click", (e) => {
+  const item = e.target.closest(".nav-item");
+  if (!item) return;
+  navigateTo(item.dataset.view);
+  closeSidebar();
+});
+
+function navigateTo(view) {
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.toggle("active", n.dataset.view === view));
+  const root = document.getElementById("admin-view-root");
+  root.innerHTML = `<div class="empty-state"><i class="fas fa-spinner fa-spin"></i><h3>Carregando...</h3></div>`;
+  const renderers = {
+    dashboard: renderDashboard, candidatos: renderCandidatos, perguntas: renderPerguntas,
+    provas: renderProvas, resultados: renderResultados, seguranca: renderSeguranca, configuracoes: renderConfiguracoes
+  };
+  (renderers[view] || renderDashboard)();
+}
+
+/* ---- Dashboard ---- */
+async function renderDashboard() {
+  try {
+  const [usersSnap, attemptsSnap, secSnap, examsSnap] = await Promise.all([
+    db.ref("users").once("value"),
+    db.ref("attempts").once("value"),
+    db.ref("securityEvents").orderByChild("timestamp").limitToLast(80).once("value"),
+    db.ref("exams").once("value")
+  ]);
+  const users = usersSnap.val() || {};
+  const attempts = attemptsSnap.val() || {};
+  const exams = examsSnap.val() || {};
+  const candidatos = Object.values(users).filter(u => u.role === "candidato");
+  const attemptList = Object.values(attempts);
+  const concluidas = attemptList.filter(a => a.status === "concluida");
+  const emAndamento = attemptList.filter(a => a.status === "em_andamento");
+  const pendentes = candidatos.filter(c => c.assignedExamId && !attemptList.some(a => a.userId === c.uid && a.examId === c.assignedExamId)).length;
+  const notas = concluidas.filter(a => typeof a.score === "number").map(a => a.score);
+  const media = notas.length ? (notas.reduce((s, n) => s + n, 0) / notas.length).toFixed(1) : "—";
+  const secEvents = Object.values(secSnap.val() || {}).sort((a, b) => b.timestamp - a.timestamp);
+
+  document.getElementById("admin-view-root").innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>Dashboard</h1>
+        <div class="subtitle">Visão geral do sistema de avaliação</div>
+      </div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
+        <div class="stat-label">Candidatos</div>
+        <div class="stat-value">${candidatos.length}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--good-soft);color:var(--good)"><i class="fas fa-check-circle"></i></div>
+        <div class="stat-label">Concluídas</div>
+        <div class="stat-value good">${concluidas.length}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--warn-soft);color:var(--warn)"><i class="fas fa-hourglass-half"></i></div>
+        <div class="stat-label">Em andamento</div>
+        <div class="stat-value warn">${emAndamento.length}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+        <div class="stat-label">Pendentes</div>
+        <div class="stat-value">${pendentes}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-star"></i></div>
+        <div class="stat-label">Média das notas</div>
+        <div class="stat-value">${media}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--bad-soft);color:var(--bad)"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="stat-label">Alertas segurança</div>
+        <div class="stat-value ${secEvents.length ? "bad" : ""}">${secEvents.length}</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title"><i class="fas fa-shield-alt" style="margin-right:8px;color:var(--bad)"></i>Alertas de segurança recentes</div>
+      <div class="section-desc">Últimos eventos registrados durante as avaliações.</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Quando</th><th>Candidato</th><th>Tipo</th><th>Detalhes</th></tr></thead>
+          <tbody>
+            ${secEvents.length ? secEvents.slice(0, 10).map(ev => {
+              const u = users[ev.userId];
+              return `<tr>
+                <td class="small">${fmtDateTime(ev.timestamp)}</td>
+                <td class="small">${u ? escapeHtml(u.fullName || u.username) : '<span class="muted">' + escapeHtml((ev.userId || "").slice(0, 10) + "…") + '</span>'}</td>
+                <td><span class="pill pill-bad">${escapeHtml(ev.type)}</span></td>
+                <td class="small muted">${escapeHtml(ev.details || "—")}</td>
+              </tr>`;
+            }).join("") : `<tr><td colspan="4"><div class="empty-state" style="padding:24px"><i class="fas fa-shield-alt"></i><h3>Nenhum evento</h3><p>Nenhum alerta de segurança registrado ainda.</p></div></td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="section-title"><i class="fas fa-clipboard-list" style="margin-right:8px;color:var(--accent-2)"></i>Provas ativas</div>
+      <div class="section-desc">${Object.keys(exams).length} prova(s) cadastrada(s) no sistema.</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Título</th><th>Perguntas</th><th>Criada em</th></tr></thead>
+          <tbody>
+            ${Object.keys(exams).length ? Object.entries(exams).map(([id, ex]) => `
+              <tr>
+                <td><strong>${escapeHtml(ex.title)}</strong></td>
+                <td class="small">${(ex.questionIds || []).length}</td>
+                <td class="small muted">${fmtDateTime(ex.createdAt)}</td>
+              </tr>`).join("") : `<tr><td colspan="3" class="muted">Nenhuma prova criada.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+  } catch(err) {
+    console.error("dashboard:", err);
+    document.getElementById("admin-view-root").innerHTML = `
+      <div class="empty-state" style="padding:64px 24px">
+        <i class="fas fa-exclamation-triangle" style="color:var(--bad)"></i>
+        <h3>Erro ao carregar</h3>
+        <p>${escapeHtml(fbErrorMsg(err))}</p>
+        <button class="btn btn-primary" style="margin-top:16px" onclick="openSetupGuide(3)">
+          <i class="fas fa-tools"></i> Abrir guia de configuração
+        </button>
+      </div>`;
+  }
+}
+
+/* ---- Candidatos ---- */
+async function renderCandidatos() {
+  const [usersSnap, examsSnap, attemptsSnap] = await Promise.all([
+    db.ref("users").once("value"),
+    db.ref("exams").once("value"),
+    db.ref("attempts").once("value")
+  ]);
+  const users = usersSnap.val() || {};
+  const exams = examsSnap.val() || {};
+  const attempts = Object.values(attemptsSnap.val() || {});
+  const candidatos = Object.entries(users).filter(([, u]) => u.role === "candidato");
+
+  document.getElementById("admin-view-root").innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>Candidatos</h1>
+        <div class="subtitle">${candidatos.length} candidato(s) cadastrado(s)</div>
+      </div>
+      <button class="btn btn-primary" onclick="openCreateCandidateModal()"><i class="fas fa-user-plus"></i> Novo candidato</button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Nome</th><th>Usuário</th><th>Status</th><th>Prova</th><th>Tentativas</th><th>Ações</th></tr>
+          </thead>
+          <tbody>
+            ${candidatos.length ? candidatos.map(([uid, u]) => {
+              const examTitle = u.assignedExamId && exams[u.assignedExamId] ? exams[u.assignedExamId].title : "—";
+              const userAttempts = attempts.filter(a => a.userId === uid);
+              return `<tr>
+                <td><strong>${escapeHtml(u.fullName || "—")}</strong></td>
+                <td class="small muted">${escapeHtml(u.username)}</td>
+                <td>${u.status === "bloqueado"
+                  ? '<span class="pill pill-bad"><i class="fas fa-ban"></i> Bloqueado</span>'
+                  : '<span class="pill pill-good"><i class="fas fa-check"></i> Ativo</span>'}</td>
+                <td class="small">${escapeHtml(examTitle)}</td>
+                <td class="small">${userAttempts.length}</td>
+                <td>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    <button class="btn btn-sm" onclick="openAssignExamModal('${uid}')" title="Atribuir prova"><i class="fas fa-link"></i></button>
+                    <button class="btn btn-sm" onclick="toggleBlockCandidate('${uid}','${u.status === "bloqueado" ? "ativo" : "bloqueado"}')" title="${u.status === "bloqueado" ? "Desbloquear" : "Bloquear"}">
+                      <i class="fas fa-${u.status === "bloqueado" ? "unlock" : "lock"}"></i>
+                    </button>
+                    <button class="btn btn-sm" onclick="openCandidateHistory('${uid}')" title="Histórico"><i class="fas fa-history"></i></button>
+                    <button class="btn btn-sm btn-bad" onclick="deleteCandidate('${uid}','${escapeHtml(u.username)}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>`;
+            }).join("") : `<tr><td colspan="6"><div class="empty-state"><i class="fas fa-users"></i><h3>Nenhum candidato</h3><p>Clique em "Novo candidato" para começar.</p></div></td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function openCreateCandidateModal() {
+  openModal(`
+    <h2><i class="fas fa-user-plus" style="margin-right:8px;color:var(--accent-2)"></i>Novo candidato</h2>
+    <p class="small muted" style="margin-bottom:16px">A conta é criada imediatamente com usuário e senha definidos por você.</p>
+    <label>Nome completo</label><input type="text" id="nc-fullname" placeholder="Nome completo">
+    <label>Usuário (login)</label><input type="text" id="nc-username" placeholder="usuario.candidato">
+    <label>Senha inicial</label><input type="password" id="nc-password" placeholder="Mínimo 6 caracteres">
+    <div id="nc-error"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" id="nc-submit" onclick="submitCreateCandidate()"><i class="fas fa-check"></i> Criar</button>
+    </div>`);
+}
+
+async function submitCreateCandidate() {
+  const fullName = document.getElementById("nc-fullname").value.trim();
+  const username = document.getElementById("nc-username").value.trim();
+  const password = document.getElementById("nc-password").value;
+  const errBox = document.getElementById("nc-error");
+  errBox.innerHTML = "";
+  if (!fullName || !username || !password) {
+    errBox.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-circle"></i> Preencha todos os campos.</div>`;
+    return;
+  }
+  if (password.length < 6) {
+    errBox.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-circle"></i> A senha deve ter pelo menos 6 caracteres.</div>`;
+    return;
+  }
+  const btn = document.getElementById("nc-submit");
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando...';
+  try {
+    const cred = await secondaryAuth.createUserWithEmailAndPassword(usernameToEmail(username), password);
+    await db.ref("users/" + cred.user.uid).set({
+      uid: cred.user.uid, username, fullName, role: "candidato", status: "ativo",
+      assignedExamId: null, createdAt: nowTs(), createdBy: CURRENT_PROFILE.username
+    });
+    await secondaryAuth.signOut();
+    await logAudit(CURRENT_PROFILE.username, "criar_candidato", username, `Candidato ${fullName} criado`);
+    closeModal();
+    toast("Candidato criado com sucesso.", "good");
+    renderCandidatos();
+  } catch (err) {
+    console.error(err);
+    errBox.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-circle"></i> ${escapeHtml(fbErrorMsg(err))}</div>`;
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-check"></i> Criar';
+  }
+}
+
+async function toggleBlockCandidate(uid, newStatus) {
+  await db.ref("users/" + uid + "/status").set(newStatus);
+  await logAudit(CURRENT_PROFILE.username, newStatus === "bloqueado" ? "bloquear_candidato" : "desbloquear_candidato", uid, "");
+  toast(newStatus === "bloqueado" ? "Candidato bloqueado." : "Candidato desbloqueado.", "good");
+  renderCandidatos();
+}
+
+function deleteCandidate(uid, username) {
+  confirmAction("Excluir candidato", `Tem certeza que deseja excluir "${username}"? O acesso será removido.`, async () => {
+    await db.ref("users/" + uid).remove();
+    await logAudit(CURRENT_PROFILE.username, "excluir_candidato", username, "Perfil removido");
+    toast("Candidato excluído.", "good");
+    renderCandidatos();
+  });
+}
+
+async function openAssignExamModal(uid) {
+  const [examsSnap, userSnap] = await Promise.all([
+    db.ref("exams").once("value"),
+    db.ref("users/" + uid).once("value")
+  ]);
+  const exams = examsSnap.val() || {};
+  const user = userSnap.val();
+  openModal(`
+    <h2><i class="fas fa-link" style="margin-right:8px;color:var(--accent-2)"></i>Atribuir prova</h2>
+    <p class="small muted" style="margin-bottom:12px">Candidato: <strong style="color:var(--text)">${escapeHtml(user.fullName)}</strong></p>
+    <label>Prova</label>
+    <select id="assign-exam-select">
+      <option value="">— Nenhuma —</option>
+      ${Object.entries(exams).map(([id, ex]) =>
+        `<option value="${id}" ${user.assignedExamId === id ? "selected" : ""}>${escapeHtml(ex.title)}</option>`
+      ).join("")}
+    </select>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="submitAssignExam('${uid}')"><i class="fas fa-check"></i> Salvar</button>
+    </div>`);
+}
+
+async function submitAssignExam(uid) {
+  const examId = document.getElementById("assign-exam-select").value || null;
+  await db.ref("users/" + uid + "/assignedExamId").set(examId);
+  await logAudit(CURRENT_PROFILE.username, "atribuir_prova", uid, examId || "removida");
+  closeModal();
+  toast("Prova atribuída.", "good");
+  renderCandidatos();
+}
+
+async function openCandidateHistory(uid) {
+  const [attemptsSnap, userSnap, examsSnap] = await Promise.all([
+    db.ref("attempts").orderByChild("userId").equalTo(uid).once("value"),
+    db.ref("users/" + uid).once("value"),
+    db.ref("exams").once("value")
+  ]);
+  const attempts = Object.entries(attemptsSnap.val() || {});
+  const user = userSnap.val();
+  const exams = examsSnap.val() || {};
+  openModal(`
+    <h2><i class="fas fa-history" style="margin-right:8px;color:var(--accent-2)"></i>Histórico — ${escapeHtml(user.fullName)}</h2>
+    <div class="table-wrap" style="margin-top:16px">
+      <table>
+        <thead><tr><th>Prova</th><th>Status</th><th>Nota</th><th>Início</th><th>Fim</th></tr></thead>
+        <tbody>
+          ${attempts.length ? attempts.map(([, a]) => `
+            <tr>
+              <td class="small">${escapeHtml(exams[a.examId] ? exams[a.examId].title : "—")}</td>
+              <td>${a.status === "concluida"
+                ? '<span class="pill pill-good">Concluída</span>'
+                : '<span class="pill pill-warn">Em andamento</span>'}</td>
+              <td class="small">${typeof a.score === "number" ? a.score : "—"}</td>
+              <td class="small muted">${fmtDateTime(a.startedAt)}</td>
+              <td class="small muted">${fmtDateTime(a.finishedAt)}</td>
+            </tr>`).join("") : `<tr><td colspan="5" class="muted">Nenhuma tentativa registrada.</td></tr>`}
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Fechar</button></div>`);
+}
+
+/* ---- Perguntas ---- */
+async function renderPerguntas() {
+  const snap = await db.ref("questions").once("value");
+  const questions = snap.val() || {};
+  const list = Object.entries(questions).sort((a, b) => (a[1].order || 0) - (b[1].order || 0));
+
+  document.getElementById("admin-view-root").innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>Banco de Perguntas</h1>
+        <div class="subtitle">${list.length} pergunta(s) cadastrada(s)</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        ${list.length === 0 ? `<button class="btn btn-good" onclick="seedInitialQuestions()"><i class="fas fa-database"></i> Carregar 24 perguntas</button>` : ""}
+        <button class="btn btn-primary" onclick="openQuestionModal()"><i class="fas fa-plus"></i> Nova pergunta</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Pergunta</th><th>Categoria</th><th>Tipo</th><th>Dificuldade</th><th>Pts</th><th>Tempo</th><th>Ativa</th><th>Ações</th></tr>
+          </thead>
+          <tbody>
+            ${list.length ? list.map(([id, q]) => `
+              <tr>
+                <td class="small muted">${q.order || "—"}</td>
+                <td class="small" style="max-width:260px">${escapeHtml((q.text || "").slice(0, 80))}${(q.text || "").length > 80 ? "…" : ""}</td>
+                <td class="small">${escapeHtml(q.category || "—")}</td>
+                <td><span class="pill pill-neutral">${q.type === "multipla" ? "Múltipla" : "Aberta"}</span></td>
+                <td class="small">${escapeHtml(q.difficulty || "—")}</td>
+                <td class="small">${q.score ?? "—"}</td>
+                <td class="small">${q.timeSeconds || "—"}s</td>
+                <td>${q.active === false
+                  ? '<span class="pill pill-bad">Inativa</span>'
+                  : '<span class="pill pill-good">Ativa</span>'}</td>
+                <td>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    <button class="btn btn-sm" onclick="openQuestionModal('${id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-sm" onclick="duplicateQuestion('${id}')" title="Duplicar"><i class="fas fa-copy"></i></button>
+                    <button class="btn btn-sm btn-bad" onclick="deleteQuestion('${id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>`).join("") : `<tr><td colspan="9"><div class="empty-state"><i class="fas fa-question-circle"></i><h3>Nenhuma pergunta</h3><p>Carregue as 24 iniciais ou crie uma nova.</p></div></td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+async function seedInitialQuestions() {
+  confirmAction("Carregar perguntas", "Carregar as 24 perguntas iniciais no banco de dados?", async () => {
+    try {
+      const updates = {};
+      SEED_QUESTIONS.forEach(q => { updates["questions/" + genId("q")] = q; });
+      await db.ref().update(updates);
+      await logAudit(CURRENT_PROFILE.username, "carregar_perguntas_iniciais", "", "24 perguntas inseridas");
+      toast("Perguntas iniciais carregadas.", "good");
+      renderPerguntas();
+    } catch(err) { console.error(err); toast(fbErrorMsg(err), "error"); }
+  });
+}
+
+async function openQuestionModal(id) {
+  let q = {
+    text: "", category: "", theme: "", type: "aberta", options: ["", ""],
+    correctIndex: 0, score: 10, difficulty: "media", timeSeconds: 90,
+    mandatory: true, active: true, order: 0
+  };
+  if (id) {
+    const snap = await db.ref("questions/" + id).once("value");
+    q = Object.assign(q, snap.val());
+  }
+  const optionsHtml = (q.options && q.options.length ? q.options : ["", ""]).map((opt, i) => `
+    <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
+      <input type="radio" name="qm-correct" value="${i}" ${q.correctIndex === i ? "checked" : ""} style="width:auto;accent-color:var(--accent)">
+      <input type="text" class="qm-option" value="${escapeHtml(opt)}" placeholder="Alternativa ${String.fromCharCode(65 + i)}" style="flex:1">
+    </div>`).join("");
+
+  openModal(`
+    <h2><i class="fas fa-question-circle" style="margin-right:8px;color:var(--accent-2)"></i>${id ? "Editar" : "Nova"} pergunta</h2>
+    <label>Enunciado</label>
+    <textarea id="qm-text" rows="5" placeholder="Digite o enunciado completo...">${escapeHtml(q.text)}</textarea>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div><label>Categoria</label><input type="text" id="qm-category" value="${escapeHtml(q.category || "")}" placeholder="Ex: Liderança"></div>
+      <div><label>Tema</label><input type="text" id="qm-theme" value="${escapeHtml(q.theme || "")}" placeholder="Ex: Feedback"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <label>Tipo</label>
+        <select id="qm-type" onchange="document.getElementById('qm-options-block').classList.toggle('hidden', this.value!=='multipla')">
+          <option value="aberta" ${q.type === "aberta" ? "selected" : ""}>Aberta (dissertativa)</option>
+          <option value="multipla" ${q.type === "multipla" ? "selected" : ""}>Múltipla escolha</option>
+        </select>
+      </div>
+      <div>
+        <label>Dificuldade</label>
+        <select id="qm-difficulty">
+          <option value="facil" ${q.difficulty === "facil" ? "selected" : ""}>Fácil</option>
+          <option value="media" ${q.difficulty === "media" ? "selected" : ""}>Média</option>
+          <option value="dificil" ${q.difficulty === "dificil" ? "selected" : ""}>Difícil</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      <div><label>Pontuação</label><input type="number" id="qm-score" value="${q.score ?? 10}"></div>
+      <div><label>Tempo (seg)</label><input type="number" id="qm-time" value="${q.timeSeconds || 90}"></div>
+      <div><label>Ordem</label><input type="number" id="qm-order" value="${q.order || 0}"></div>
+    </div>
+    <div style="display:flex;gap:24px;margin-top:16px">
+      <label style="display:flex;align-items:center;gap:8px;margin:0;font-weight:400;color:var(--text)">
+        <input type="checkbox" id="qm-mandatory" style="width:auto;accent-color:var(--accent)" ${q.mandatory !== false ? "checked" : ""}> Obrigatória
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;margin:0;font-weight:400;color:var(--text)">
+        <input type="checkbox" id="qm-active" style="width:auto;accent-color:var(--accent)" ${q.active !== false ? "checked" : ""}> Ativa
+      </label>
+    </div>
+    <div id="qm-options-block" class="${q.type !== "multipla" ? "hidden" : ""}" style="margin-top:16px">
+      <label>Alternativas (marque a correta)</label>
+      <div id="qm-options-list">${optionsHtml}</div>
+      <button type="button" class="btn btn-sm" style="margin-top:8px" onclick="addOptionField()"><i class="fas fa-plus"></i> Alternativa</button>
+    </div>
+    <div id="qm-error"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="submitQuestion(${id ? `'${id}'` : "null"})"><i class="fas fa-save"></i> Salvar</button>
+    </div>`);
+}
+
+function addOptionField() {
+  const list = document.getElementById("qm-options-list");
+  const idx = list.querySelectorAll(".qm-option").length;
+  const div = document.createElement("div");
+  div.style.cssText = "display:flex;gap:8px;margin-bottom:8px;align-items:center";
+  div.innerHTML = `
+    <input type="radio" name="qm-correct" value="${idx}" style="width:auto;accent-color:var(--accent)">
+    <input type="text" class="qm-option" placeholder="Alternativa ${String.fromCharCode(65 + idx)}" style="flex:1">`;
+  list.appendChild(div);
+}
+
+async function submitQuestion(id) {
+  const text = document.getElementById("qm-text").value.trim();
+  const type = document.getElementById("qm-type").value;
+  const errBox = document.getElementById("qm-error");
+  if (!text) {
+    errBox.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-circle"></i> O enunciado é obrigatório.</div>`;
+    return;
+  }
+  const data = {
+    text,
+    category: document.getElementById("qm-category").value.trim(),
+    theme: document.getElementById("qm-theme").value.trim(),
+    type,
+    score: Number(document.getElementById("qm-score").value) || 0,
+    timeSeconds: Number(document.getElementById("qm-time").value) || 90,
+    order: Number(document.getElementById("qm-order").value) || 0,
+    difficulty: document.getElementById("qm-difficulty").value,
+    mandatory: document.getElementById("qm-mandatory").checked,
+    active: document.getElementById("qm-active").checked,
+    options: [],
+    correctIndex: null
+  };
+  if (type === "multipla") {
+    const opts = Array.from(document.querySelectorAll(".qm-option")).map(i => i.value.trim());
+    const correctRadio = document.querySelector('input[name="qm-correct"]:checked');
+    if (opts.some(o => !o)) {
+      errBox.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-circle"></i> Preencha todas as alternativas.</div>`;
+      return;
+    }
+    if (!correctRadio) {
+      errBox.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-circle"></i> Marque a alternativa correta.</div>`;
+      return;
+    }
+    data.options = opts;
+    data.correctIndex = Number(correctRadio.value);
+  }
+  if (id) {
+    await db.ref("questions/" + id).update(data);
+    await logAudit(CURRENT_PROFILE.username, "editar_pergunta", id, "");
+  } else {
+    data.createdAt = nowTs();
+    await db.ref("questions/" + genId("q")).set(data);
+    await logAudit(CURRENT_PROFILE.username, "criar_pergunta", "", text.slice(0, 60));
+  }
+  closeModal();
+  toast("Pergunta salva.", "good");
+  renderPerguntas();
+}
+
+async function duplicateQuestion(id) {
+  const snap = await db.ref("questions/" + id).once("value");
+  const q = snap.val();
+  q.text = q.text + " (cópia)";
+  q.createdAt = nowTs();
+  await db.ref("questions/" + genId("q")).set(q);
+  await logAudit(CURRENT_PROFILE.username, "duplicar_pergunta", id, "");
+  toast("Pergunta duplicada.", "good");
+  renderPerguntas();
+}
+
+function deleteQuestion(id) {
+  confirmAction("Excluir pergunta", "Esta pergunta será removida de provas futuras. Continuar?", async () => {
+    await db.ref("questions/" + id).remove();
+    await logAudit(CURRENT_PROFILE.username, "excluir_pergunta", id, "");
+    toast("Pergunta excluída.", "good");
+    renderPerguntas();
+  });
+}
+
+/* ---- Provas ---- */
+async function renderProvas() {
+  const examsSnap = await db.ref("exams").once("value");
+  const exams = Object.entries(examsSnap.val() || {});
+  document.getElementById("admin-view-root").innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>Provas</h1>
+        <div class="subtitle">${exams.length} prova(s) criada(s)</div>
+      </div>
+      <button class="btn btn-primary" onclick="openExamModal()"><i class="fas fa-plus"></i> Nova prova</button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Título</th><th>Perguntas</th><th>Criada em</th><th>Ações</th></tr></thead>
+          <tbody>
+            ${exams.length ? exams.map(([id, ex]) => `
+              <tr>
+                <td><strong>${escapeHtml(ex.title)}</strong></td>
+                <td class="small">${(ex.questionIds || []).length}</td>
+                <td class="small muted">${fmtDateTime(ex.createdAt)}</td>
+                <td>
+                  <div style="display:flex;gap:6px">
+                    <button class="btn btn-sm" onclick="openExamModal('${id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-sm btn-bad" onclick="deleteExam('${id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>`).join("") : `<tr><td colspan="4"><div class="empty-state"><i class="fas fa-clipboard-list"></i><h3>Nenhuma prova</h3><p>Crie uma prova selecionando perguntas do banco.</p></div></td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+async function openExamModal(id) {
+  let ex = { title: "", questionIds: [] };
+  if (id) {
+    const snap = await db.ref("exams/" + id).once("value");
+    ex = Object.assign(ex, snap.val());
+  }
+  const qSnap = await db.ref("questions").once("value");
+  const questions = Object.entries(qSnap.val() || {}).sort((a, b) => (a[1].order || 0) - (b[1].order || 0));
+
+  openModal(`
+    <h2><i class="fas fa-clipboard-list" style="margin-right:8px;color:var(--accent-2)"></i>${id ? "Editar" : "Nova"} prova</h2>
+    <label>Título da prova</label>
+    <input type="text" id="em-title" value="${escapeHtml(ex.title)}" placeholder="Ex: Avaliação de Recrutamento — Turma 01">
+    <label>Perguntas incluídas (${questions.length} disponíveis)</label>
+    <div style="max-height:280px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;padding:12px;background:var(--bg-elev-2)">
+      ${questions.length ? questions.map(([qid, q]) => `
+        <label style="display:flex;align-items:flex-start;gap:10px;margin:0 0 12px;font-weight:400;color:var(--text);cursor:pointer">
+          <input type="checkbox" class="em-qcheck" value="${qid}" style="width:auto;margin-top:3px;accent-color:var(--accent)" ${(ex.questionIds || []).includes(qid) ? "checked" : ""}>
+          <span class="small">${escapeHtml((q.text || "").slice(0, 110))}${(q.text || "").length > 110 ? "…" : ""}
+            <span class="muted"> · ${escapeHtml(q.category || "sem categoria")}</span>
+          </span>
+        </label>`).join("") : `<p class="muted small">Nenhuma pergunta no banco ainda.</p>`}
+    </div>
+    <div id="em-error"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="submitExam(${id ? `'${id}'` : "null"})"><i class="fas fa-save"></i> Salvar</button>
+    </div>`);
+}
+
+async function submitExam(id) {
+  const title = document.getElementById("em-title").value.trim();
+  const questionIds = Array.from(document.querySelectorAll(".em-qcheck:checked")).map(c => c.value);
+  const errBox = document.getElementById("em-error");
+  if (!title) {
+    errBox.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-circle"></i> Informe o título.</div>`;
+    return;
+  }
+  if (!questionIds.length) {
+    errBox.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-circle"></i> Selecione ao menos uma pergunta.</div>`;
+    return;
+  }
+  if (id) {
+    await db.ref("exams/" + id).update({ title, questionIds });
+    await logAudit(CURRENT_PROFILE.username, "editar_prova", id, title);
+  } else {
+    await db.ref("exams/" + genId("exam")).set({
+      title, questionIds, createdAt: nowTs(), createdBy: CURRENT_PROFILE.username
+    });
+    await logAudit(CURRENT_PROFILE.username, "criar_prova", "", title);
+  }
+  closeModal();
+  toast("Prova salva.", "good");
+  renderProvas();
+}
+
+function deleteExam(id) {
+  confirmAction("Excluir prova", "Tem certeza que deseja excluir esta prova?", async () => {
+    await db.ref("exams/" + id).remove();
+    await logAudit(CURRENT_PROFILE.username, "excluir_prova", id, "");
+    toast("Prova excluída.", "good");
+    renderProvas();
+  });
+}
+
+/* ---- Resultados ---- */
+async function renderResultados() {
+  const [attemptsSnap, usersSnap, examsSnap] = await Promise.all([
+    db.ref("attempts").once("value"),
+    db.ref("users").once("value"),
+    db.ref("exams").once("value")
+  ]);
+  const attempts = Object.entries(attemptsSnap.val() || {}).sort((a, b) => (b[1].startedAt || 0) - (a[1].startedAt || 0));
+  const users = usersSnap.val() || {};
+  const exams = examsSnap.val() || {};
+
+  document.getElementById("admin-view-root").innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>Resultados</h1>
+        <div class="subtitle">${attempts.length} tentativa(s) registrada(s)</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Candidato</th><th>Prova</th><th>Status</th><th>Nota</th><th>Tempo</th><th>Início</th><th>Ações</th></tr>
+          </thead>
+          <tbody>
+            ${attempts.length ? attempts.map(([id, a]) => `
+              <tr>
+                <td class="small"><strong>${escapeHtml(users[a.userId] ? users[a.userId].fullName : "—")}</strong></td>
+                <td class="small">${escapeHtml(exams[a.examId] ? exams[a.examId].title : "—")}</td>
+                <td>${a.status === "concluida"
+                  ? '<span class="pill pill-good">Concluída</span>'
+                  : '<span class="pill pill-warn">Em andamento</span>'}</td>
+                <td class="small">${typeof a.score === "number" ? `<strong>${a.score}</strong>` : "—"}</td>
+                <td class="small muted">${a.totalTimeSeconds ? fmtSeconds(a.totalTimeSeconds) : "—"}</td>
+                <td class="small muted">${fmtDateTime(a.startedAt)}</td>
+                <td><button class="btn btn-sm" onclick="openAttemptDetail('${id}')"><i class="fas fa-eye"></i> Detalhes</button></td>
+              </tr>`).join("") : `<tr><td colspan="7"><div class="empty-state"><i class="fas fa-trophy"></i><h3>Nenhuma tentativa</h3><p>Os resultados aparecerão aqui quando os candidatos finalizarem as provas.</p></div></td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+async function openAttemptDetail(attemptId) {
+  const attemptSnap = await db.ref("attempts/" + attemptId).once("value");
+  const attempt = attemptSnap.val();
+  const [userSnap, examSnap, secSnap] = await Promise.all([
+    db.ref("users/" + attempt.userId).once("value"),
+    db.ref("exams/" + attempt.examId).once("value"),
+    db.ref("securityEvents").orderByChild("attemptId").equalTo(attemptId).once("value")
+  ]);
+  const user = userSnap.val() || {};
+  const exam = examSnap.val() || {};
+  const secEvents = Object.values(secSnap.val() || {}).sort((a, b) => a.timestamp - b.timestamp);
+  const qIds = attempt.questionOrder || exam.questionIds || [];
+  const qSnaps = await Promise.all(qIds.map(qid => db.ref("questions/" + qid).once("value")));
+  const questions = qSnaps.map((s, i) => ({ id: qIds[i], ...(s.val() || {}) }));
+  const answers = attempt.answers || {};
+
+  openModal(`
+    <h2><i class="fas fa-file-alt" style="margin-right:8px;color:var(--accent-2)"></i>Detalhes da tentativa</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0;font-size:0.85rem">
+      <div><span class="muted">Candidato:</span> <strong>${escapeHtml(user.fullName)}</strong></div>
+      <div><span class="muted">Prova:</span> ${escapeHtml(exam.title)}</div>
+      <div><span class="muted">Status:</span> ${attempt.status}</div>
+      <div><span class="muted">Nota:</span> <strong>${typeof attempt.score === "number" ? attempt.score : "—"}</strong></div>
+      <div><span class="muted">Tempo total:</span> ${attempt.totalTimeSeconds ? fmtSeconds(attempt.totalTimeSeconds) : "—"}</div>
+      <div><span class="muted">Sessão:</span> <span class="small muted">${escapeHtml((attempt.sessionId || "—").slice(0, 16))}…</span></div>
+    </div>
+    <div class="section-title" style="margin-top:18px">Respostas</div>
+    <div style="max-height:300px;overflow-y:auto;margin-top:10px">
+      ${questions.map((q, i) => {
+        const ans = answers[q.id] || {};
+        let answerDisplay = "—", correctness = "";
+        if (q.type === "multipla") {
+          answerDisplay = (ans.optionIndex !== undefined && ans.optionIndex !== null && q.options)
+            ? escapeHtml(q.options[ans.optionIndex] || "—")
+            : '<em class="muted">Não respondida</em>';
+          if (ans.optionIndex !== undefined && ans.optionIndex !== null) {
+            correctness = ans.optionIndex === q.correctIndex
+              ? '<span class="pill pill-good">Correta</span>'
+              : '<span class="pill pill-bad">Incorreta</span>';
+          }
+        } else {
+          answerDisplay = ans.text ? escapeHtml(ans.text) : '<em class="muted">Não respondida</em>';
+        }
+        return `<div class="card" style="margin-bottom:10px;padding:14px">
+          <div class="small muted">Pergunta ${i + 1}${q.category ? " · " + escapeHtml(q.category) : ""} · ${ans.timeSpentSeconds ? fmtSeconds(ans.timeSpentSeconds) : "—"}</div>
+          <div class="small" style="margin:6px 0;white-space:pre-wrap;line-height:1.5">${escapeHtml((q.text || "").slice(0, 180))}${(q.text || "").length > 180 ? "…" : ""}</div>
+          <div class="small" style="padding:10px 12px;background:var(--bg-elev-2);border-radius:8px;margin-top:6px">
+            ${answerDisplay} ${correctness}
+          </div>
+        </div>`;
+      }).join("")}
+    </div>
+    <div class="section-title" style="margin-top:18px">
+      <i class="fas fa-shield-alt" style="margin-right:6px;color:var(--bad)"></i>
+      Eventos de segurança (${secEvents.length})
+    </div>
+    <div class="table-wrap" style="max-height:160px;overflow-y:auto;margin-top:8px">
+      <table>
+        <thead><tr><th>Quando</th><th>Tipo</th></tr></thead>
+        <tbody>
+          ${secEvents.length ? secEvents.map(ev => `
+            <tr>
+              <td class="small">${fmtDateTime(ev.timestamp)}</td>
+              <td><span class="pill pill-bad">${escapeHtml(ev.type)}</span></td>
+            </tr>`).join("") : `<tr><td colspan="2" class="muted small">Nenhum evento.</td></tr>`}
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Fechar</button></div>`);
+}
+
+/* ---- Segurança ---- */
+async function renderSeguranca() {
+  const [secSnap, auditSnap] = await Promise.all([
+    db.ref("securityEvents").orderByChild("timestamp").limitToLast(200).once("value"),
+    db.ref("auditLogs").orderByChild("timestamp").limitToLast(200).once("value")
+  ]);
+  const secEvents = Object.values(secSnap.val() || {}).sort((a, b) => b.timestamp - a.timestamp);
+  const auditLogs = Object.values(auditSnap.val() || {}).sort((a, b) => b.timestamp - a.timestamp);
+
+  document.getElementById("admin-view-root").innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>Central de Segurança</h1>
+        <div class="subtitle">Eventos de prova e auditoria administrativa</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title"><i class="fas fa-exclamation-triangle" style="margin-right:8px;color:var(--bad)"></i>Eventos de segurança (provas)</div>
+      <div class="section-desc">Troca de aba, perda de foco, saída de tela cheia, desconexões e tentativas de manipulação.</div>
+      <div class="table-wrap" style="max-height:340px;overflow-y:auto">
+        <table>
+          <thead><tr><th>Quando</th><th>Usuário</th><th>Tipo</th><th>Detalhes</th></tr></thead>
+          <tbody>
+            ${secEvents.length ? secEvents.map(ev => `
+              <tr>
+                <td class="small">${fmtDateTime(ev.timestamp)}</td>
+                <td class="small muted">${escapeHtml(ev.userId ? ev.userId.slice(0, 12) + "…" : "—")}</td>
+                <td><span class="pill pill-bad">${escapeHtml(ev.type)}</span></td>
+                <td class="small muted">${escapeHtml(ev.details || "—")}</td>
+              </tr>`).join("") : `<tr><td colspan="4"><div class="empty-state" style="padding:24px"><i class="fas fa-shield-alt"></i><h3>Nenhum evento</h3></div></td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title"><i class="fas fa-history" style="margin-right:8px;color:var(--accent-2)"></i>Log de auditoria</div>
+      <div class="section-desc">Ações administrativas registradas no sistema.</div>
+      <div class="table-wrap" style="max-height:340px;overflow-y:auto">
+        <table>
+          <thead><tr><th>Quando</th><th>Autor</th><th>Ação</th><th>Alvo</th><th>Detalhes</th></tr></thead>
+          <tbody>
+            ${auditLogs.length ? auditLogs.map(l => `
+              <tr>
+                <td class="small">${fmtDateTime(l.timestamp)}</td>
+                <td class="small">${escapeHtml(l.actor)}</td>
+                <td><span class="pill pill-neutral">${escapeHtml(l.action)}</span></td>
+                <td class="small muted">${escapeHtml(l.target || "—")}</td>
+                <td class="small muted">${escapeHtml(l.details || "—")}</td>
+              </tr>`).join("") : `<tr><td colspan="5" class="muted">Nenhum registro.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+/* ---- Configurações ---- */
+async function renderConfiguracoes() {
+  document.getElementById("admin-view-root").innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>Configurações</h1>
+        <div class="subtitle">Conta administrativa</div>
+      </div>
+    </div>
+    <div class="card" style="max-width:480px">
+      <div class="section-title"><i class="fas fa-user-cog" style="margin-right:8px"></i>Minha conta</div>
+      <p class="small muted" style="margin:12px 0 4px">Usuário: <strong style="color:var(--text)">${escapeHtml(CURRENT_PROFILE.username)}</strong></p>
+      <p class="small muted" style="margin-bottom:16px">Nome: <strong style="color:var(--text)">${escapeHtml(CURRENT_PROFILE.fullName || "—")}</strong></p>
+      <label>Nova senha</label>
+      <input type="password" id="cfg-newpass" placeholder="Mínimo 6 caracteres">
+      <button class="btn btn-primary" style="margin-top:16px" onclick="changeOwnPassword()">
+        <i class="fas fa-key"></i> Atualizar senha
+      </button>
+      <div id="cfg-msg"></div>
+    </div>`;
+}
+
+async function changeOwnPassword() {
+  const newPass = document.getElementById("cfg-newpass").value;
+  const msgBox = document.getElementById("cfg-msg");
+  if (!newPass || newPass.length < 6) {
+    msgBox.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-circle"></i> A senha deve ter pelo menos 6 caracteres.</div>`;
+    return;
+  }
+  try {
+    await auth.currentUser.updatePassword(newPass);
+    await logAudit(CURRENT_PROFILE.username, "alterar_propria_senha", "", "");
+    msgBox.innerHTML = `<div class="success-msg"><i class="fas fa-check-circle"></i> Senha atualizada com sucesso.</div>`;
+    document.getElementById("cfg-newpass").value = "";
+  } catch (err) {
+    console.error(err);
+    let msg = "Erro ao atualizar senha.";
+    if (err.code === "auth/requires-recent-login") msg = "Por segurança, saia e entre novamente antes de trocar a senha.";
+    msgBox.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-circle"></i> ${msg}</div>`;
+  }
+}
+
+/* ============================================================
+   ÁREA DO CANDIDATO — PROVA
+   ============================================================ */
+let ATTEMPT_ID = null, ATTEMPT = null, QUESTIONS = [], CURRENT_INDEX = 0;
+let QUESTION_STARTED_AT = 0, TIMER_INTERVAL = null, TIME_LEFT = 0, SUBMITTING = false;
+
+async function initExam() {
+  if (!CURRENT_PROFILE.assignedExamId) {
+    showBlocked("Nenhuma avaliação atribuída", "Você ainda não possui nenhuma prova atribuída pelo administrador. Entre em contato com a coordenação.");
+    return;
+  }
+  const examSnap = await db.ref("exams/" + CURRENT_PROFILE.assignedExamId).once("value");
+  const exam = examSnap.val();
+  if (!exam) {
+    showBlocked("Avaliação indisponível", "A prova atribuída não foi encontrada. Contate o administrador.");
+    return;
+  }
+  document.getElementById("exam-title").textContent = exam.title;
+
+  const attemptsSnap = await db.ref("attempts").orderByChild("userId").equalTo(CURRENT_USER.uid).once("value");
+  const existing = Object.entries(attemptsSnap.val() || {}).find(([, a]) => a.examId === CURRENT_PROFILE.assignedExamId);
+
+  if (existing && existing[1].status === "concluida") {
+    showBlocked("Avaliação já concluída", "Você já finalizou esta avaliação em " + fmtDateTime(existing[1].finishedAt) + ". Os resultados estão com a coordenação.");
+    teardownAntiCheat();
+    return;
+  }
+
+  if (existing) {
+    ATTEMPT_ID = existing[0];
+    ATTEMPT = existing[1];
+    logSecurityEvent(ATTEMPT_ID, CURRENT_USER.uid, "reconexao", "Candidato retomou a prova");
+  } else {
+    const qSnaps = await Promise.all((exam.questionIds || []).map(qid => db.ref("questions/" + qid).once("value")));
+    const allQuestions = qSnaps.map((s, i) => ({ id: exam.questionIds[i], ...(s.val() || {}) })).filter(q => q.active !== false);
+    const shuffledOrder = shuffleArray(allQuestions.map(q => q.id));
+    const optionOrders = {};
+    allQuestions.forEach(q => {
+      if (q.type === "multipla" && q.options && q.options.length) {
+        optionOrders[q.id] = shuffleArray(q.options.map((_, i) => i));
+      }
+    });
+    ATTEMPT_ID = genId("att");
+    ATTEMPT = {
+      userId: CURRENT_USER.uid,
+      examId: CURRENT_PROFILE.assignedExamId,
+      sessionId: genId("sess"),
+      status: "em_andamento",
+      startedAt: nowTs(),
+      finishedAt: null,
+      currentIndex: 0,
+      questionOrder: shuffledOrder,
+      optionOrders,
+      answers: {}
+    };
+    await db.ref("attempts/" + ATTEMPT_ID).set(ATTEMPT);
+    await logSecurityEvent(ATTEMPT_ID, CURRENT_USER.uid, "inicio_prova", "");
+    await logAudit(CURRENT_PROFILE.username, "iniciar_prova", exam.title, "");
+  }
+
+  const qSnaps = await Promise.all(ATTEMPT.questionOrder.map(qid => db.ref("questions/" + qid).once("value")));
+  QUESTIONS = qSnaps.map((s, i) => ({ id: ATTEMPT.questionOrder[i], ...(s.val() || {}) }));
+  CURRENT_INDEX = ATTEMPT.currentIndex || 0;
+
+  setupAntiCheat();
+  startWatermark();
+  renderQuestion();
+}
+
+function showBlocked(title, msg) {
+  document.getElementById("exam-body").innerHTML = "";
+  document.getElementById("exam-footer").style.display = "none";
+  document.getElementById("blocked-root").innerHTML = `
+    <div class="blocked-overlay">
+      <div class="card" style="text-align:center">
+        <div style="font-size:2.5rem;margin-bottom:12px;opacity:0.6"><i class="fas fa-lock"></i></div>
+        <h2 style="margin:0 0 10px">${escapeHtml(title)}</h2>
+        <p class="muted">${escapeHtml(msg)}</p>
+        <button class="btn btn-ghost" style="margin-top:18px" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+      </div>
+    </div>`;
+}
+
+function renderQuestion() {
+  if (CURRENT_INDEX >= QUESTIONS.length) {
+    finalizeAttempt();
+    return;
+  }
+  const q = QUESTIONS[CURRENT_INDEX];
+  const total = QUESTIONS.length;
+  const pct = Math.round(((CURRENT_INDEX) / total) * 100);
+
+  document.getElementById("exam-progress").textContent = `Pergunta ${CURRENT_INDEX + 1} de ${total}`;
+  document.getElementById("exam-progress-fill").style.width = pct + "%";
+  document.getElementById("exam-footer").style.display = "flex";
+  document.getElementById("prev-btn").style.display = CURRENT_INDEX > 0 ? "inline-flex" : "none";
+
+  let bodyHtml = "";
+  if (q.type === "multipla" && q.options && q.options.length) {
+    const order = (ATTEMPT.optionOrders && ATTEMPT.optionOrders[q.id]) || q.options.map((_, i) => i);
+    const existingAnswer = (ATTEMPT.answers[q.id] || {}).optionIndex;
+    bodyHtml = order.map((origIdx, displayIdx) => `
+      <div class="option-row ${existingAnswer === origIdx ? "selected" : ""}" onclick="selectOption(${origIdx}, this)">
+        <span class="opt-letter">${String.fromCharCode(65 + displayIdx)}</span>
+        <input type="radio" name="opt" ${existingAnswer === origIdx ? "checked" : ""}>
+        <span>${escapeHtml(q.options[origIdx])}</span>
+      </div>`).join("");
+  } else {
+    const existingText = (ATTEMPT.answers[q.id] || {}).text || "";
+    bodyHtml = `<textarea id="answer-text" rows="8" placeholder="Digite sua resposta de forma clara e objetiva...">${escapeHtml(existingText)}</textarea>`;
+  }
+
+  document.getElementById("exam-body").innerHTML = `
+    <div class="question-card">
+      <div class="question-index">
+        <i class="fas fa-comment-alt"></i>
+        Pergunta ${CURRENT_INDEX + 1}${q.category ? " · " + escapeHtml(q.category) : ""}
+      </div>
+      <div class="question-text">${escapeHtml(q.text)}</div>
+      <div id="options-area">${bodyHtml}</div>
+    </div>`;
+
+  const isLast = CURRENT_INDEX === QUESTIONS.length - 1;
+  document.getElementById("next-btn").innerHTML = isLast
+    ? '<i class="fas fa-check"></i> Finalizar prova'
+    : '<i class="fas fa-arrow-right"></i> Próxima';
+
+  QUESTION_STARTED_AT = nowTs();
+  startTimer(q.timeSeconds || 90);
+}
+
+function selectOption(idx, el) {
+  document.querySelectorAll(".option-row").forEach(r => r.classList.remove("selected"));
+  el.classList.add("selected");
+  el.querySelector("input").checked = true;
+  saveCurrentAnswer(idx, null, false);
+}
+
+function startTimer(seconds) {
+  clearInterval(TIMER_INTERVAL);
+  TIME_LEFT = seconds;
+  updateTimerLabel();
+  TIMER_INTERVAL = setInterval(() => {
+    TIME_LEFT--;
+    updateTimerLabel();
+    if (TIME_LEFT <= 0) {
+      clearInterval(TIMER_INTERVAL);
+      submitCurrentAnswer(true);
+    }
+  }, 1000);
+}
+
+function updateTimerLabel() {
+  const badge = document.getElementById("timer-badge");
+  if (!badge) return;
+  badge.innerHTML = `<i class="fas fa-clock"></i> <span>${fmtSeconds(TIME_LEFT)}</span>`;
+  badge.classList.toggle("low", TIME_LEFT <= 15);
+}
+
+let autosaveTimeout = null;
+function saveCurrentAnswer(optionIndex, text, debounce) {
+  const q = QUESTIONS[CURRENT_INDEX];
+  const timeSpent = Math.round((nowTs() - QUESTION_STARTED_AT) / 1000);
+  const answerData = { timeSpentSeconds: timeSpent, answeredAt: nowTs() };
+  if (optionIndex !== null && optionIndex !== undefined) answerData.optionIndex = optionIndex;
+  if (text !== null && text !== undefined) answerData.text = text;
+  ATTEMPT.answers[q.id] = Object.assign(ATTEMPT.answers[q.id] || {}, answerData);
+
+  const doSave = () => {
+    db.ref(`attempts/${ATTEMPT_ID}/answers/${q.id}`).set(ATTEMPT.answers[q.id]);
+    const label = document.getElementById("autosave-label");
+    if (label) label.innerHTML = `<i class="fas fa-check-circle" style="color:var(--good);margin-right:4px"></i>Salvo às ${new Date().toLocaleTimeString("pt-BR")}`;
+  };
+  if (debounce) {
+    clearTimeout(autosaveTimeout);
+    autosaveTimeout = setTimeout(doSave, 600);
+  } else {
+    doSave();
+  }
+}
+
+document.addEventListener("input", (e) => {
+  if (e.target && e.target.id === "answer-text") {
+    saveCurrentAnswer(null, e.target.value, true);
+  }
+});
+
+async function prevQuestion() {
+  if (CURRENT_INDEX <= 0 || SUBMITTING) return;
+  clearInterval(TIMER_INTERVAL);
+  const textEl = document.getElementById("answer-text");
+  if (textEl) saveCurrentAnswer(null, textEl.value, false);
+  CURRENT_INDEX--;
+  await db.ref(`attempts/${ATTEMPT_ID}/currentIndex`).set(CURRENT_INDEX);
+  ATTEMPT.currentIndex = CURRENT_INDEX;
+  renderQuestion();
+}
+
+async function submitCurrentAnswer(byTimeout) {
+  if (SUBMITTING) return;
+  SUBMITTING = true;
+  clearInterval(TIMER_INTERVAL);
+
+  const q = QUESTIONS[CURRENT_INDEX];
+  const textEl = document.getElementById("answer-text");
+  if (textEl) saveCurrentAnswer(null, textEl.value, false);
+  else if (!ATTEMPT.answers[q.id]) saveCurrentAnswer(null, null, false);
+
+  if (byTimeout === true) {
+    logSecurityEvent(ATTEMPT_ID, CURRENT_USER.uid, "tempo_esgotado", `Pergunta ${CURRENT_INDEX + 1}`);
+  }
+
+  const isLast = CURRENT_INDEX === QUESTIONS.length - 1;
+  if (isLast && byTimeout !== true) {
+    // Confirmação antes de finalizar
+    SUBMITTING = false;
+    confirmAction(
+      "Finalizar prova",
+      "Tem certeza que deseja finalizar? Você não poderá alterar as respostas depois.",
+      async () => {
+        SUBMITTING = true;
+        CURRENT_INDEX++;
+        await db.ref(`attempts/${ATTEMPT_ID}/currentIndex`).set(CURRENT_INDEX);
+        ATTEMPT.currentIndex = CURRENT_INDEX;
+        SUBMITTING = false;
+        renderQuestion();
+      }
+    );
+    // Se cancelar, reinicia o timer
+    startTimer(TIME_LEFT > 0 ? TIME_LEFT : 30);
+    return;
+  }
+
+  CURRENT_INDEX++;
+  await db.ref(`attempts/${ATTEMPT_ID}/currentIndex`).set(CURRENT_INDEX);
+  ATTEMPT.currentIndex = CURRENT_INDEX;
+  SUBMITTING = false;
+  renderQuestion();
+}
+
+async function finalizeAttempt() {
+  clearInterval(TIMER_INTERVAL);
+  let correctCount = 0, wrongCount = 0, unanswered = 0, scoreSum = 0, maxObjectiveScore = 0;
+
+  QUESTIONS.forEach(q => {
+    const ans = ATTEMPT.answers[q.id];
+    if (q.type === "multipla") {
+      maxObjectiveScore += (q.score || 0);
+      if (!ans || ans.optionIndex === undefined || ans.optionIndex === null) {
+        unanswered++;
+        return;
+      }
+      if (ans.optionIndex === q.correctIndex) {
+        correctCount++;
+        scoreSum += (q.score || 0);
+      } else {
+        wrongCount++;
+      }
+    } else {
+      if (!ans || !ans.text) unanswered++;
+    }
+  });
+
+  const totalTimeSeconds = Math.round((nowTs() - ATTEMPT.startedAt) / 1000);
+  const finalData = {
+    status: "concluida",
+    finishedAt: nowTs(),
+    totalTimeSeconds,
+    correctCount,
+    wrongCount,
+    unansweredCount: unanswered,
+    score: maxObjectiveScore > 0 ? scoreSum : null
+  };
+  await db.ref("attempts/" + ATTEMPT_ID).update(finalData);
+  await logSecurityEvent(ATTEMPT_ID, CURRENT_USER.uid, "finalizacao", "Prova finalizada");
+  await logAudit(CURRENT_PROFILE.username, "finalizar_prova", ATTEMPT.examId, `Nota objetiva: ${finalData.score ?? "N/A"}`);
+  teardownAntiCheat();
+
+  document.getElementById("exam-footer").style.display = "none";
+  document.getElementById("exam-progress-fill").style.width = "100%";
+  document.getElementById("exam-body").innerHTML = `
+    <div class="question-card" style="text-align:center;padding:48px 32px">
+      <div style="width:72px;height:72px;border-radius:50%;background:var(--good-soft);color:var(--good);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem">
+        <i class="fas fa-check"></i>
+      </div>
+      <h2 style="margin:0 0 10px;font-size:1.4rem">Avaliação finalizada</h2>
+      <p class="muted" style="max-width:400px;margin:0 auto 24px;line-height:1.6">
+        Suas respostas foram registradas com sucesso. A coordenação da DP PROVA MAJOR GENERAL irá analisar seu resultado.
+      </p>
+      <button class="btn btn-primary" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+    </div>`;
+}
+
+/* Anti-cheat */
+function setupAntiCheat() {
+  document.body.classList.add("exam-lock");
+  document.addEventListener("visibilitychange", onVisibilityChange);
+  window.addEventListener("blur", onWindowBlur);
+  document.addEventListener("fullscreenchange", onFullscreenChange);
+  document.addEventListener("contextmenu", blockEvent);
+  document.addEventListener("copy", blockEvent);
+  document.addEventListener("cut", blockEvent);
+  document.addEventListener("paste", blockEvent);
+  document.addEventListener("keydown", blockDevKeys);
+  window.addEventListener("beforeunload", beforeUnloadHandler);
+  requestFullscreenBestEffort();
+}
+function teardownAntiCheat() {
+  document.body.classList.remove("exam-lock");
+  document.removeEventListener("visibilitychange", onVisibilityChange);
+  window.removeEventListener("blur", onWindowBlur);
+  document.removeEventListener("fullscreenchange", onFullscreenChange);
+  document.removeEventListener("contextmenu", blockEvent);
+  document.removeEventListener("copy", blockEvent);
+  document.removeEventListener("cut", blockEvent);
+  document.removeEventListener("paste", blockEvent);
+  document.removeEventListener("keydown", blockDevKeys);
+  window.removeEventListener("beforeunload", beforeUnloadHandler);
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+}
+function blockEvent(e) { e.preventDefault(); return false; }
+function blockDevKeys(e) {
+  const key = e.key ? e.key.toUpperCase() : "";
+  if (e.key === "F12") { e.preventDefault(); logSecurityEvent(ATTEMPT_ID, CURRENT_USER.uid, "tentativa_devtools", "F12"); }
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && ["I", "J", "C"].includes(key)) {
+    e.preventDefault();
+    logSecurityEvent(ATTEMPT_ID, CURRENT_USER.uid, "tentativa_devtools", key);
+  }
+  if ((e.ctrlKey || e.metaKey) && key === "U") e.preventDefault();
+  if ((e.ctrlKey || e.metaKey) && ["C", "V", "X"].includes(key)) e.preventDefault();
+}
+function onVisibilityChange() {
+  if (document.hidden) logSecurityEvent(ATTEMPT_ID, CURRENT_USER.uid, "troca_de_aba", "");
+}
+function onWindowBlur() {
+  logSecurityEvent(ATTEMPT_ID, CURRENT_USER.uid, "perda_de_foco", "");
+}
+function onFullscreenChange() {
+  if (!document.fullscreenElement && ATTEMPT && ATTEMPT.status !== "concluida") {
+    logSecurityEvent(ATTEMPT_ID, CURRENT_USER.uid, "saida_tela_cheia", "");
+  }
+}
+function beforeUnloadHandler(e) {
+  if (ATTEMPT && ATTEMPT.status !== "concluida") {
+    logSecurityEvent(ATTEMPT_ID, CURRENT_USER.uid, "tentativa_fechar_aba", "");
+    e.preventDefault();
+    e.returnValue = "";
+    return "";
+  }
+}
+function requestFullscreenBestEffort() {
+  const el = document.documentElement;
+  if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+}
+
+function startWatermark() {
+  const layer = document.getElementById("watermark-layer");
+  const text = `DP PROVA · ${CURRENT_PROFILE.fullName.toUpperCase()} · ${ATTEMPT.sessionId.slice(-8)}`;
+  const positions = [];
+  for (let i = 0; i < 8; i++) positions.push({ top: Math.random() * 90, left: Math.random() * 80 });
+  layer.innerHTML = positions.map((p, i) =>
+    `<div class="watermark-text" id="wm-${i}" style="top:${p.top}%;left:${p.left}%">${escapeHtml(text)}</div>`
+  ).join("");
+  setInterval(() => {
+    positions.forEach((p, i) => {
+      const el = document.getElementById("wm-" + i);
+      if (el) {
+        el.style.top = (Math.random() * 90) + "%";
+        el.style.left = (Math.random() * 80) + "%";
+      }
+    });
+  }, 9000);
+}
+
+/* ============================================================
+   SETUP WIZARD & HELP FAB
+   ============================================================ */
+const FB_RULES_JSON = `{
+  "rules": {
+    "users": {
+      ".read": "auth != null && root.child(\'users\').child(auth.uid).child(\'role\').val() === \'admin\'",
+      "$uid": {
+        ".read":  "$uid === auth.uid || (auth != null && root.child(\'users\').child(auth.uid).child(\'role\').val() === \'admin\')",
+        ".write": "$uid === auth.uid || (auth != null && root.child(\'users\').child(auth.uid).child(\'role\').val() === \'admin\')"
+      }
+    },
+    "exams": {
+      ".read":  "auth != null",
+      ".write": "auth != null && root.child(\'users\').child(auth.uid).child(\'role\').val() === \'admin\'"
+    },
+    "questions": {
+      ".read":  "auth != null",
+      ".write": "auth != null && root.child(\'users\').child(auth.uid).child(\'role\').val() === \'admin\'"
+    },
+    "attempts": {
+      ".read": "auth != null && root.child(\'users\').child(auth.uid).child(\'role\').val() === \'admin\'",
+      "$attemptId": {
+        ".read":  "auth != null && (data.child(\'userId\').val() === auth.uid || root.child(\'users\').child(auth.uid).child(\'role\').val() === \'admin\')",
+        ".write": "auth != null && (!data.exists() || data.child(\'userId\').val() === auth.uid || root.child(\'users\').child(auth.uid).child(\'role\').val() === \'admin\')"
+      },
+      ".indexOn": ["userId", "examId"]
+    },
+    "securityEvents": {
+      ".read":  "auth != null && root.child(\'users\').child(auth.uid).child(\'role\').val() === \'admin\'",
+      ".write": "auth != null",
+      ".indexOn": ["attemptId", "timestamp"]
+    },
+    "auditLogs": {
+      ".read":  "auth != null && root.child(\'users\').child(auth.uid).child(\'role\').val() === \'admin\'",
+      ".write": "auth != null",
+      ".indexOn": ["timestamp"]
+    }
+  }
+}`;
+
+const SETUP_STEPS = [
+  {
+    icon:"fas fa-rocket", color:"#3b7cff",
+    title:"Configure o Firebase em 4 passos rápidos",
+    render() { return `
+      <div style="text-align:center;margin-bottom:26px">
+        <div style="width:68px;height:68px;border-radius:20px;background:rgba(59,124,255,.13);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:1.8rem;color:var(--accent-2)"><i class="fas fa-rocket"></i></div>
+        <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:8px">Bem-vindo!</h2>
+        <p class="muted" style="max-width:460px;margin:0 auto;line-height:1.65">Este guia faz o Firebase funcionar sem nenhum erro. Siga os 4 passos abaixo.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+        ${[
+          ["fas fa-key","#7c3aed","Passo 1","Ativar Autenticação por e-mail"],
+          ["fas fa-database","#991b1b","Passo 2","Aplicar regras do banco (obrigatório)"],
+          ["fas fa-user-shield","#065f46","Passo 3","Criar conta de administrador"],
+          ["fas fa-users","#9a6f00","Passo 4","Cadastrar candidatos e provas"]
+        ].map(([ic,col,n,txt])=>`
+          <div class="card" style="padding:14px 16px;border-left:3px solid ${col}">
+            <div style="color:${col};font-size:.8rem;font-weight:700;margin-bottom:5px"><i class="${ic}" style="margin-right:5px"></i>${n}</div>
+            <div class="small">${txt}</div>
+          </div>`).join("")}
+      </div>
+      <div class="info-msg"><i class="fas fa-info-circle"></i><span>Projeto detectado: <strong>fir-46274</strong> · Banco: <strong>fir-46274-default-rtdb</strong></span></div>
+    `; }
+  },
+  {
+    icon:"fas fa-key", color:"#7c3aed",
+    title:"Passo 1 — Ativar Autenticação por E-mail/Senha",
+    render() { return `
+      <div class="error-msg" style="margin-bottom:18px"><i class="fas fa-exclamation-triangle"></i>
+        <span>Sem este passo qualquer login retorna <strong>auth/operation-not-allowed</strong>.</span></div>
+      <div class="card" style="margin-bottom:18px">
+        <div class="small muted" style="margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em">Acesse direto no seu projeto</div>
+        <a href="https://console.firebase.google.com/project/fir-46274/authentication/providers" target="_blank" class="btn btn-primary">
+          <i class="fas fa-external-link-alt"></i> Abrir Authentication → Sign-in method
+        </a>
+      </div>
+      <ol style="padding-left:1.3rem;line-height:2.1;font-size:.9rem">
+        <li>Clique no link acima</li>
+        <li>Localize <strong>"E-mail/senha"</strong> na lista de provedores</li>
+        <li>Clique nele para abrir</li>
+        <li>Ative o <strong>primeiro toggle: "E-mail/senha → Ativado"</strong></li>
+        <li>Deixe o segundo toggle desativado</li>
+        <li>Clique em <strong>Salvar</strong></li>
+      </ol>
+      <div class="success-msg" style="margin-top:16px"><i class="fas fa-check-circle"></i>
+        <span>Após salvar, o status fica <strong>Ativado</strong> com ícone verde.</span></div>
+    `; }
+  },
+  {
+    icon:"fas fa-database", color:"#991b1b",
+    title:"Passo 2 — Regras do Banco (causa número 1 de erros)",
+    render() { return `
+      <div class="error-msg" style="margin-bottom:16px"><i class="fas fa-exclamation-triangle"></i>
+        <span>Sem este passo tudo retorna <strong>PERMISSION_DENIED</strong>. É obrigatório.</span></div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="small muted" style="margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em">Acesse direto no seu projeto</div>
+        <a href="https://console.firebase.google.com/project/fir-46274/database/fir-46274-default-rtdb/rules" target="_blank" class="btn btn-primary">
+          <i class="fas fa-external-link-alt"></i> Abrir Realtime Database → Regras
+        </a>
+      </div>
+      <div class="small muted" style="margin-bottom:8px;line-height:1.6">
+        <strong>O que fazer:</strong> selecione todo o conteúdo das regras (Ctrl+A), delete, cole o JSON abaixo, clique em <strong>Publicar</strong>.
+      </div>
+      <div style="position:relative">
+        <button onclick="cpRegras()" style="position:absolute;top:8px;right:8px;z-index:2;padding:5px 12px;border-radius:6px;border:none;cursor:pointer;background:rgba(59,124,255,.2);color:var(--accent-2);font-size:.78rem;font-weight:700;font-family:inherit" id="cp-rules-btn"><i class="fas fa-copy"></i> Copiar</button>
+        <pre id="rules-pre" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;padding-top:40px;font-size:.71rem;overflow:auto;max-height:270px;line-height:1.75;color:#93c5fd;font-family:'Courier New',monospace;user-select:all;white-space:pre">${escapeHtml(FB_RULES_JSON)}</pre>
+      </div>
+      <div id="cp-ok" class="success-msg hidden" style="margin-top:8px"><i class="fas fa-check-circle"></i> Copiado para a área de transferência!</div>
+      <div class="info-msg" style="margin-top:12px"><i class="fas fa-info-circle"></i>
+        <span>Este JSON inclui <code>.indexOn</code> que evita avisos de índice no console.</span></div>
+    `; }
+  },
+  {
+    icon:"fas fa-user-shield", color:"#065f46",
+    title:"Passo 3 — Criar a Conta de Administrador (uma vez só)",
+    render() { return `
+      <div class="info-msg" style="margin-bottom:18px"><i class="fas fa-info-circle"></i>
+        <span>Faça <strong>uma única vez</strong>. Cria a conta admin que controla o sistema.</span></div>
+      <div class="card" style="margin-bottom:16px;padding:16px">
+        <div style="font-weight:700;margin-bottom:8px">Ir para a tela de Bootstrap</div>
+        <p class="small muted" style="margin-bottom:12px;line-height:1.6">A tela de bootstrap cria o primeiro administrador. É acessada adicionando <code>#bootstrap</code> na URL do sistema.</p>
+        <button onclick="showView('bootstrap')" class="btn btn-good"><i class="fas fa-user-shield"></i> Abrir Bootstrap</button>
+      </div>
+      <ol style="padding-left:1.3rem;line-height:2.1;font-size:.9rem">
+        <li>Clique em <strong>"Abrir Bootstrap"</strong> acima</li>
+        <li>Preencha: nome completo, usuário (sem espaços) e senha (mín. 6 caracteres)</li>
+        <li>Clique em <strong>"Criar administrador"</strong></li>
+        <li>Aguarde a mensagem verde de sucesso</li>
+        <li>Você será redirecionado para o login</li>
+        <li>Faça login com o usuário e senha criados</li>
+      </ol>
+      <div class="error-msg" style="margin-top:14px"><i class="fas fa-exclamation-triangle"></i>
+        <span>Não compartilhe a URL com <code>#bootstrap</code> — qualquer pessoa pode criar um admin por ela.</span></div>
+    `; }
+  },
+  {
+    icon:"fas fa-users", color:"#9a6f00",
+    title:"Passo 4 — Usar o Sistema (fluxo completo)",
+    render() { return `
+      <div class="success-msg" style="margin-bottom:18px"><i class="fas fa-check-circle"></i>
+        <span>Se chegou aqui com tudo configurado, o sistema está funcionando!</span></div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        ${[
+          ["var(--accent)","①","Carregar perguntas","Painel → Perguntas → clique em <strong>"Carregar 24 perguntas"</strong> (aparece se o banco estiver vazio)"],
+          ["var(--accent)","②","Criar prova","Painel → Provas → <strong>Nova prova</strong> → título + marcar perguntas → Salvar"],
+          ["var(--accent)","③","Criar candidatos","Painel → Candidatos → <strong>Novo candidato</strong> → nome, usuário e senha → Criar"],
+          ["var(--accent)","④","Atribuir prova","Candidatos → ícone <i class="fas fa-link"></i> → selecionar a prova → Salvar"],
+          ["var(--good)","✓","Candidato faz a prova","Candidato loga com as credenciais → tela cheia automática → responde → finaliza"],
+          ["var(--good)","✓","Ver resultados","Painel → Resultados → botão Detalhes → respostas, tempo e eventos de segurança"]
+        ].map(([col,num,tit,desc])=>`
+          <div class="card" style="padding:14px 16px;border-left:3px solid ${col}">
+            <div style="font-weight:700;margin-bottom:4px"><span style="color:${col}">${num}</span> ${tit}</div>
+            <div class="small muted">${desc}</div>
+          </div>`).join("")}
+      </div>
+      <div style="text-align:center;margin-top:20px">
+        <button onclick="finishSetup()" class="btn btn-good" style="padding:12px 28px;font-size:.95rem">
+          <i class="fas fa-check"></i> Entendido — ir para o login
+        </button>
+      </div>
+    `; }
+  }
+];
+
+let SETUP_IDX = 0;
+
+function openSetupGuide(startAt) {
+  SETUP_IDX = (typeof startAt === "number") ? startAt : 0;
+  showView("setup");
+  renderSetupStep();
+}
+
+function renderSetupStep() {
+  const s = SETUP_STEPS[SETUP_IDX];
+  const total = SETUP_STEPS.length;
+  const body = document.getElementById("setup-body");
+  body.innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px">
+      <div style="width:46px;height:46px;border-radius:13px;background:${s.color}22;border:1px solid ${s.color}44;display:flex;align-items:center;justify-content:center;color:${s.color};font-size:1.25rem;flex-shrink:0"><i class="${s.icon}"></i></div>
+      <h2 style="font-size:1.15rem;font-weight:800;line-height:1.3">${s.title}</h2>
+    </div>
+    ${s.render()}
+  `;
+  body.scrollTop = 0;
+  document.getElementById("setup-prog").style.width = ((SETUP_IDX + 1) / total * 100) + "%";
+  document.getElementById("setup-step-label").textContent = (SETUP_IDX + 1) + " de " + total;
+  document.getElementById("setup-prev").style.display = SETUP_IDX > 0 ? "inline-flex" : "none";
+  const nextBtn = document.getElementById("setup-next");
+  if (SETUP_IDX === total - 1) {
+    nextBtn.innerHTML = '<i class="fas fa-check"></i> Concluir';
+    nextBtn.onclick = finishSetup;
+  } else {
+    nextBtn.innerHTML = 'Próximo <i class="fas fa-arrow-right"></i>';
+    nextBtn.onclick = () => setupNav(1);
+  }
+  // Bind copiar regras se estiver no passo 2
+  setTimeout(() => {
+    const btn = document.getElementById("cp-rules-btn");
+    if (btn) btn.onclick = cpRegras;
+  }, 50);
+}
+
+function setupNav(dir) {
+  SETUP_IDX = Math.max(0, Math.min(SETUP_STEPS.length - 1, SETUP_IDX + dir));
+  renderSetupStep();
+}
+
+function finishSetup() {
+  try { localStorage.setItem("dp_setup_done", "1"); } catch(e){}
+  showView("login");
+  showHelpFab();
+}
+
+function cpRegras() {
+  navigator.clipboard.writeText(FB_RULES_JSON).then(() => {
+    const ok = document.getElementById("cp-ok");
+    if (ok) { ok.classList.remove("hidden"); setTimeout(() => ok.classList.add("hidden"), 2500); }
+    const btn = document.getElementById("cp-rules-btn");
+    if (btn) {
+      const o = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+      btn.style.background = "rgba(34,197,94,.2)"; btn.style.color = "var(--good)";
+      setTimeout(() => { btn.innerHTML = o; btn.style.background = ""; btn.style.color = ""; }, 2500);
+    }
+  }).catch(() => {
+    const pre = document.getElementById("rules-pre");
+    if (pre) { const r = document.createRange(); r.selectNodeContents(pre); const s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+  });
+}
+
+function showHelpFab() {
+  const f = document.getElementById("help-fab");
+  if (f) f.style.display = "block";
+}
+
+function alertHelpFab() {
+  showHelpFab();
+  const b = document.getElementById("help-fab-badge");
+  if (b) b.classList.remove("hidden");
+}
+
+// Setup guide link removed
+
+
+/* ============================================================
+   DIAGNÓSTICO DE DOMÍNIO — GitHub Pages / hospedagem externa
+   ============================================================ */
+const GITHUB_PAGES_DOMAIN = "davizinhomelhor2015-dot.github.io";
+
+function currentHost() {
+  return location.hostname || GITHUB_PAGES_DOMAIN;
+}
+
+function showDomainFix() {
+  const host = currentHost();
+  const isFile = location.protocol === "file:";
+  const authUrl = "https://console.firebase.google.com/project/fir-46274/authentication/settings";
+
+  const html = isFile ? `
+    <h2><i class="fas fa-exclamation-triangle" style="color:var(--bad);margin-right:8px"></i>Arquivo aberto localmente</h2>
+    <p class="muted" style="margin:14px 0;line-height:1.7">
+      O Firebase bloqueia login quando o arquivo é aberto direto do computador (<code>file://</code>).
+      Use o GitHub Pages ou um servidor local.
+    </p>
+    <div style="background:var(--bg-elev-2);border:1px solid var(--border);border-radius:10px;padding:14px;margin:14px 0">
+      <div class="small muted" style="margin-bottom:8px;font-weight:600">Servidor local rápido:</div>
+      <code style="display:block;font-size:.8rem;color:var(--accent-2);padding:8px;background:var(--bg);border-radius:6px">python3 -m http.server 8080</code>
+      <div class="small muted" style="margin-top:8px">Depois acesse: <code>http://localhost:8080</code></div>
+    </div>
+    <div class="modal-actions"><button class="btn btn-primary" onclick="closeModal()">Entendi</button></div>
+  ` : `
+    <h2><i class="fas fa-globe" style="color:var(--warn);margin-right:8px"></i>Autorizar este domínio no Firebase</h2>
+    <p class="muted" style="margin:14px 0 16px;line-height:1.7">
+      O Firebase só aceita login de domínios autorizados. Adicione o domínio abaixo em
+      <strong>Authentication → Settings → Domínios autorizados</strong>.
+    </p>
+
+    <div style="background:var(--bg-elev-2);border:1px solid var(--accent);border-radius:10px;padding:16px;margin-bottom:16px">
+      <div class="small muted" style="margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Copie este domínio</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <code id="host-to-copy" style="flex:1;font-size:1rem;color:var(--accent-2);padding:12px 14px;background:var(--bg);border-radius:8px;user-select:all;font-weight:600">${escapeHtml(host)}</code>
+        <button class="btn btn-primary btn-sm" onclick="copyHost()"><i class="fas fa-copy"></i> Copiar</button>
+      </div>
+      <div id="host-copied" class="success-msg hidden" style="margin-top:10px"><i class="fas fa-check-circle"></i> Copiado!</div>
+    </div>
+
+    <div style="margin-bottom:16px">
+      <a href="${authUrl}" target="_blank" class="btn btn-primary btn-block">
+        <i class="fas fa-external-link-alt"></i> Abrir Authentication → Settings
+      </a>
+    </div>
+
+    <ol style="padding-left:1.3rem;line-height:2.1;font-size:.88rem;color:var(--text-dim)">
+      <li>Clique no botão acima para abrir o Firebase Console</li>
+      <li>Role até a seção <strong style="color:var(--text)">Domínios autorizados</strong></li>
+      <li>Clique em <strong style="color:var(--text)">"Adicionar domínio"</strong></li>
+      <li>Cole o domínio copiado: <code style="color:var(--accent-2)">${escapeHtml(host)}</code></li>
+      <li>Clique em <strong style="color:var(--text)">Adicionar</strong></li>
+      <li>Volte aqui e <strong style="color:var(--text)">recarregue a página</strong> (F5)</li>
+    </ol>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Fechar</button>
+      <button class="btn btn-good" onclick="location.reload()"><i class="fas fa-redo"></i> Já autorizei — recarregar</button>
+    </div>
+  `;
+  openModal(html);
+}
+
+function copyHost() {
+  const host = currentHost();
+  navigator.clipboard.writeText(host).then(() => {
+    const el = document.getElementById("host-copied");
+    if (el) { el.classList.remove("hidden"); setTimeout(() => el.classList.add("hidden"), 2500); }
+  }).catch(() => {
+    const el = document.getElementById("host-to-copy");
+    if (el) { const r = document.createRange(); r.selectNodeContents(el); const s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+  });
+}
+
+/* Detecta ambiente e exibe no rodapé do login */
+(function showEnvInfo() {
+  window.addEventListener("load", () => {
+    const el = document.getElementById("fb-status");
+    if (!el) return;
+    if (location.protocol === "file:") {
+      el.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--warn);font-size:.7rem"></i> ' +
+        '<a href="#" onclick="showDomainFix();return false" style="color:var(--warn)">Arquivo local — clique para ver como resolver</a>';
+    }
+  });
+})();
+
+
+/* Banner de aviso se estiver no GitHub Pages sem autorização */
+(function githubPagesCheck() {
+  window.addEventListener("load", () => {
+    if (!location.hostname.includes("github.io")) return;
+    // Testa a conexão com Firebase Auth após 2s
+    setTimeout(() => {
+      const st = document.getElementById("fb-status");
+      if (st && !FIREBASE_CONNECTED) {
+        st.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--warn);font-size:.7rem"></i> ' +
+          '<a href="#" onclick="showDomainFix();return false" style="color:var(--warn)">Domínio precisa ser autorizado — clique aqui</a>';
+      }
+    }, 2500);
+  });
+})();
+
+
+/* ============================================================
+   DIAGNÓSTICO AUTOMÁTICO — testa cada parte do Firebase
+   ============================================================ */
+const DIAG = { sdk:null, app:null, dbConn:null, dbRead:null, authReady:null, domain:null, errors:[] };
+
+function diagBadge(state) {
+  if (state === true)  return '<span style="color:var(--good)">✓ OK</span>';
+  if (state === false) return '<span style="color:var(--bad)">✗ FALHOU</span>';
+  if (state === "wait")return '<span style="color:var(--warn)">⏳ testando…</span>';
+  return '<span style="color:var(--text-faint)">— não testado</span>';
+}
+
+function renderDiag() {
+  const host = location.hostname || "(file://)";
+  const proto = location.protocol;
+  const rows = [
+    ["SDK do Firebase carregado", DIAG.sdk, "Os 3 scripts do Firebase (app, auth, database) precisam carregar do gstatic.com"],
+    ["App inicializado", DIAG.app, "firebase.initializeApp() executou sem erro"],
+    ["Conexão com o Realtime Database", DIAG.dbConn, "O banco precisa existir na URL configurada"],
+    ["Leitura do banco (regras)", DIAG.dbRead, "As regras precisam permitir leitura"],
+    ["Serviço de Autenticação", DIAG.authReady, "Authentication precisa estar habilitado"],
+    ["Domínio autorizado", DIAG.domain, "Este domínio precisa estar na lista de domínios autorizados"]
+  ];
+
+  const html = `
+    <h2><i class="fas fa-stethoscope" style="margin-right:8px;color:var(--accent-2)"></i>Diagnóstico do Firebase</h2>
+    <p class="muted small" style="margin:10px 0 16px">Ambiente: <code>${escapeHtml(proto)}//${escapeHtml(host)}</code></p>
+
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px">
+      ${rows.map(([label, state, hint], i) => `
+        <div style="padding:12px 14px;${i < rows.length-1 ? 'border-bottom:1px solid var(--border-soft)' : ''};background:${state===false?'rgba(239,68,68,.07)':'transparent'}">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+            <span style="font-size:.87rem;font-weight:500">${label}</span>
+            <span style="font-size:.8rem;font-weight:700;white-space:nowrap">${diagBadge(state)}</span>
+          </div>
+          ${state===false ? `<div class="small muted" style="margin-top:5px;line-height:1.5">${hint}</div>` : ''}
+        </div>`).join("")}
+    </div>
+
+    ${DIAG.errors.length ? `
+      <div style="background:var(--bg-elev-2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px">
+        <div class="small" style="font-weight:700;margin-bottom:8px;color:var(--bad)">Erros capturados:</div>
+        ${DIAG.errors.map(e => `<div class="small muted" style="font-family:monospace;font-size:.75rem;padding:4px 0;border-bottom:1px solid var(--border-soft)">${escapeHtml(e)}</div>`).join("")}
+      </div>` : ''}
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${DIAG.domain === false ? `
+        <div class="error-msg" style="margin:0">
+          <i class="fas fa-globe"></i>
+          <span><strong>Ação necessária:</strong> adicione <code style="color:#fff;user-select:all">${escapeHtml(host)}</code> em
+          <a href="https://console.firebase.google.com/project/fir-46274/authentication/settings" target="_blank" style="color:#fff;text-decoration:underline">Authentication → Settings → Domínios autorizados</a></span>
+        </div>` : ''}
+      ${DIAG.dbConn === false ? `
+        <div class="error-msg" style="margin:0">
+          <i class="fas fa-database"></i>
+          <span><strong>Ação necessária:</strong> verifique se o Realtime Database existe em
+          <a href="https://console.firebase.google.com/project/fir-46274/database" target="_blank" style="color:#fff;text-decoration:underline">console → Realtime Database</a>.
+          A URL deve ser <code style="color:#fff">fir-46274-default-rtdb.firebaseio.com</code></span>
+        </div>` : ''}
+      ${DIAG.dbRead === false ? `
+        <div class="error-msg" style="margin:0">
+          <i class="fas fa-lock"></i>
+          <span><strong>Ação necessária:</strong> aplique as regras em
+          <a href="https://console.firebase.google.com/project/fir-46274/database/fir-46274-default-rtdb/rules" target="_blank" style="color:#fff;text-decoration:underline">Realtime Database → Regras</a>
+          <button class="btn btn-sm btn-primary" style="margin-left:8px" onclick="cpRegras()">Copiar regras</button></span>
+        </div>` : ''}
+      ${DIAG.authReady === false ? `
+        <div class="error-msg" style="margin:0">
+          <i class="fas fa-key"></i>
+          <span><strong>Ação necessária:</strong> ative E-mail/senha em
+          <a href="https://console.firebase.google.com/project/fir-46274/authentication/providers" target="_blank" style="color:#fff;text-decoration:underline">Authentication → Sign-in method</a></span>
+        </div>` : ''}
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Fechar</button>
+      <button class="btn btn-primary" onclick="runDiagnostics(true)"><i class="fas fa-redo"></i> Testar novamente</button>
+    </div>`;
+  openModal(html);
+}
+
+async function runDiagnostics(showResult) {
+  DIAG.errors = [];
+
+  // 1. SDK
+  DIAG.sdk = (typeof firebase !== "undefined" && !!firebase.initializeApp);
+  if (!DIAG.sdk) DIAG.errors.push("SDK do Firebase não carregou (bloqueio de rede ou CDN inacessível)");
+
+  // 2. App
+  try { DIAG.app = !!(fbApp && fbApp.options && fbApp.options.projectId); }
+  catch(e) { DIAG.app = false; DIAG.errors.push("initializeApp: " + (e.code||e.message)); }
+
+  // 3. Conexão com o banco (timeout 6s)
+  DIAG.dbConn = await new Promise(resolve => {
+    let done = false;
+    const t = setTimeout(() => { if(!done){ done=true; DIAG.errors.push("Timeout: banco não respondeu em 6s — verifique se o Realtime Database existe"); resolve(false); } }, 6000);
+    try {
+      db.ref(".info/connected").on("value", snap => {
+        if (done) return;
+        if (snap.val() === true) { done=true; clearTimeout(t); resolve(true); }
+      });
+    } catch(e) { done=true; clearTimeout(t); DIAG.errors.push("db.ref: " + (e.code||e.message)); resolve(false); }
+  });
+
+  // 4. Leitura do banco (testa regras)
+  try {
+    await db.ref("questions").limitToFirst(1).once("value");
+    DIAG.dbRead = true;
+  } catch(e) {
+    DIAG.dbRead = false;
+    DIAG.errors.push("Leitura: " + (e.code || e.message || "PERMISSION_DENIED"));
+  }
+
+  // 5 e 6. Auth + domínio — testa com credencial inválida proposital
+  try {
+    await auth.signInWithEmailAndPassword("___diag___@dplynwood.local", "___diag___");
+    DIAG.authReady = true; DIAG.domain = true;
+  } catch(e) {
+    const c = e.code || "";
+    if (c === "auth/unauthorized-domain") {
+      DIAG.domain = false; DIAG.authReady = null;
+      DIAG.errors.push("Domínio não autorizado: " + (location.hostname||"file://"));
+    } else if (c === "auth/operation-not-allowed") {
+      DIAG.authReady = false; DIAG.domain = true;
+      DIAG.errors.push("Authentication: provedor E-mail/senha desativado");
+    } else if (c === "auth/configuration-not-found") {
+      DIAG.authReady = false; DIAG.domain = true;
+      DIAG.errors.push("Authentication não configurado no projeto");
+    } else {
+      // user-not-found / invalid-credential = Auth funcionando normalmente
+      DIAG.authReady = true; DIAG.domain = true;
+    }
+  }
+
+  if (showResult) renderDiag();
+  return DIAG;
+}
+
+/* Link de diagnóstico no rodapé do login se travar conectando */
+(function autoDiagnose() {
+  window.addEventListener("load", () => {
+    setTimeout(async () => {
+      if (FIREBASE_CONNECTED) return;
+      const st = document.getElementById("fb-status");
+      if (!st) return;
+      st.innerHTML = '<i class="fas fa-circle" style="color:var(--bad);font-size:0.55rem"></i> ' +
+        '<a href="#" onclick="runDiagnostics(true);return false" style="color:var(--bad)">Falha na conexão — clique para diagnosticar</a>';
+      await runDiagnostics(false);
+    }, 5000);
+  });
+})();
+
+</script>
+</body>
+</html>
